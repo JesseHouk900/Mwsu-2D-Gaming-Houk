@@ -5,7 +5,8 @@ var gamer;
 var background;
 var parray = [];
 var winner = -1;
-var keys = {};
+var keys = [];
+var phaserKeys
 var num_players;
 
 function preload() {
@@ -23,7 +24,6 @@ function create() {
 
     num_players = prompt("Pick the number of players:", "number");
     //then you can save it via local storage
-    selectWinner();
 
     background = game.add.tileSprite(0, 0, window.innerWidth, window.innerHeight, "background");
 
@@ -33,14 +33,32 @@ function create() {
         parray[i].animations.add('game_run',[0+14*i,1+14*i,2+14*i,3+14*i,4+14*i,5+14*i,6+14*i]);
         parray[i].animations.play('game_run', 20, true);
     }
-    keys = {
-        one: this.input.keyboard.addKey(Phaser.Keyboard.ONE),
-        two: this.input.keyboard.addKey(Phaser.Keyboard.TWO),
-        three: this.input.keyboard.addKey(Phaser.Keyboard.THREE),
-        four: this.input.keyboard.addKey(Phaser.Keyboard.FOUR),
-        five: this.input.keyboard.addKey(Phaser.Keyboard.FIVE)
-    };
-
+    keys = [Phaser.Keyboard.ONE,
+        Phaser.Keyboard.TWO,
+        Phaser.Keyboard.THREE,
+        Phaser.Keyboard.FOUR,
+        Phaser.Keyboard.FIVE
+    ];
+    phaserKeys = this.input.keyboard.addKeys(keys);
+    function selectWinner() {
+        // console.log("selecting winner");
+        // winner = prompt("Select a winner:", "winner");
+        for (var i in phaserKeys) {
+            if (phaserKeys[i].isDown) {
+                winner = i;
+            }
+        }
+        // console.log(winner);
+    }
+    
+    function updateWinner() {
+        for (var i = 0; i < num_players; i++) {
+            if (i != winner - 1) {
+                parray[i].x -= .333333333333;
+            }
+        }
+    }
+    // console.log(phaserKeys);
     // cloud = game.add.sprite(0, 0, 'cloud');
     // cloud.visible = false;
 
@@ -56,6 +74,7 @@ function create() {
 
 function update(){
     background.tilePosition.x -= 2;
+    selectWinner();
     for(var i=0;i<parray.length;i++){
         let r = Math.floor(Math.random() * 100);     // returns a random integer from 0 to 99
         if(r % 2 == 0){
@@ -65,31 +84,24 @@ function update(){
         }
         updateWinner();
     }
+    
 }
 
 function selectWinner() {
-   winner = prompt("Select a winner:", "winner");
-    // if (keys.one.isDown()) {
-    //     winner = 0;
-    // }
-    // else if (keys.two.isDown()) {
-    //     winner = 1;
-    // }
-    // else if (keys.three.isDown()) {
-    //     winner = 2;
-    // }
-    // else if (keys.four.isDown()) {
-    //     winner = 3;
-    // }
-    // else if (keys.five.isDown()) {
-    //     winner = 4;
-    // }
+    // console.log("selecting winner");
+    // winner = prompt("Select a winner:", "winner");
+    for (var i in phaserKeys) {
+        if (phaserKeys[i].isDown) {
+            winner = i;
+        }
+    }
+    // console.log(winner);
 }
 
 function updateWinner() {
     for (var i = 0; i < num_players; i++) {
         if (i != winner - 1) {
-            parray[i].x -= .055555555556;
+            parray[i].x -= .333333333333;
         }
     }
 }
