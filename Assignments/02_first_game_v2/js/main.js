@@ -92,10 +92,10 @@ function create ()
     //  The score
     scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
     // The time
-    timeText = game.add.text(500, 16, "00:00", { fontSize: '32px', fill: '#000' });
+    timeText = game.add.text(700, 16, "00:00", { fontSize: '32px', fill: '#000' });
     updateClock();
     // The deaths
-    deathText = game.add.text(250, 16, "Deaths: 0", { fontSize: '32px', fill: '#000'});
+    deathText = game.add.text(600, 550, "Deaths: 0", { fontSize: '32px', fill: '#000'});
 }
 
 function update ()
