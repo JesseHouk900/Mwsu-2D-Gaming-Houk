@@ -89,10 +89,11 @@ function create ()
     
     //  Some items to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
     addItems();
-    timer.start({countdown:true, precision:'seconds', startValues: {minutes: parseInt(runTime)}});
     //  The score
     scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
     // The time
+	
+	timer.start({countdown:true, precision:'seconds', startValues: {minutes: parseInt(runTime)}});
     timeText = game.add.text(700, 16, "00:00", { fontSize: '32px', fill: '#000' });
     updateClock();
     // The deaths

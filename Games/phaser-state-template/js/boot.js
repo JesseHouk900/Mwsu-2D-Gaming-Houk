@@ -28,6 +28,7 @@ boot.prototype =
 		}
 		else // if on computer
 		{
+			console.log("on comp")
 			this.scale.minWidth = 320
 			this.scale.minHeight = 480
 			this.scale.maxWidth = 450

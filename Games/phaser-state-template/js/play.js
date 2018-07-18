@@ -1,3 +1,15 @@
+// -    Jesse Houk
+// -      7-18-18
+// -   Assignment 3
+// +	Obstacles changed to random items not in pairs.
+// +	An obstacle randomly starts at bottom of screen and moves up at some random 'x'.
+// -	Count a point for each obstacle passed.
+// -	Kill individual if they collide with obstacle.
+// -	Items should not all be the same!
+
+
+
+
 var play = function () {}
 
 // For debugging purposes, uncomment the following line
@@ -14,7 +26,8 @@ play.prototype = {
 
 		random_gap = 0
 
-		difficulty = 20
+		item_difficulty = 30
+		speed_difficulty = -20
 		// Bg color
 		this.game.stage.backgroundColor = BG_COLOR
 		// Bg image
@@ -63,25 +76,31 @@ play.prototype = {
 		this.bmpText.text = this.game.global.score
 
 		// Collision
-		this.game.physics.arcade.overlap(this.player, this.obstacles, this.hitObstacle, null, this)
+		this.obstacleCollision()
+		//this.game.physics.arcade.collide(this.player, this.obstacles, this.hitObstacle, null, this)
 ////***
 		// Spawn enemies
 		random_gap = this.game.rnd.integerInRange(0, 1000)
-		if (random_gap % difficulty > random_gap / 2) {
+		if (random_gap % item_difficulty > random_gap / 2) {
 			var gap = 120
 			var offset = (Math.random() < 0.5 ? -1 : 1) * Math.random() * (150)
-
-			this.spawnObstacle(this.game.global.obstacle_id++, w / 2 - platform_width / 2/* - gap / 2 */+ offset, this.game.height, speed = 200, has_given_point = false)
-			this.spawnObstacle(this.game.global.obstacle_id++, w / 2 + platform_width / 2/* + gap / 2 */+ offset, this.game.height, speed = 200, has_given_point = true)
+			var new_objects = Math.floor(this.game.rnd.integerInRange(0, item_difficulty) / 15)
+			for (var i = 0; i < new_objects; i++) {
+				this.spawnObstacle(/*entity number*/this.game.global.obstacle_id++,/*x*/ /*w / 2 + offset / 2 + offset*/ this.game.rnd.realInRange(0, this.game.width),/*y*/ this.game.height, /*speed*/ this.game.rnd.integerInRange(100, 400) + speed_difficulty, has_given_point = false)
+				//this.spawnObstacle(this.game.global.obstacle_id++, w / 2 + platform_width / 2/* + gap / 2 */+ offset, this.game.height, /*speed = 200*/ game.rnd.integerInRange(100, 400), has_given_point = true)
+			}
 		}
 ////***
 		this.move();
 		
 		frame_counter++
 		if (frame_counter % 85 == 0) {
-			difficulty++
+			item_difficulty++
 		}
-		this.game.global.score += this.scorePoint();
+		if (frame_counter % 45 == 0) {
+			speed_difficulty += 5
+		}
+		//this.game.global.score += this.scorePoint();
 	},
 
 	spawnObstacle: function (entity, x, y, speed,has_given_point) {
@@ -89,12 +108,12 @@ play.prototype = {
 		var r = Math.random()
 		var sizex = 1
 		var sizey = 1
-		if (r < .33) {
+		if (r < .65) {
 			obstacle = this.obstacles.create(x, y, 'obstacle',entity)
 			sizex = .1
 			obstacle.tint = 0x8b4513
 		}
-		else if (r < .66) {
+		else if (r < .9) {
 			obstacle = this.obstacles.create(x, y, 'coin', entity)
 			obstacle.animations.add('spin', [0, 1, 2, 3], 6, true)
 			obstacle.play('spin')
@@ -107,7 +126,7 @@ play.prototype = {
 		//obstacles.push(obstacle)
 
 		this.game.physics.enable(obstacle, Phaser.Physics.ARCADE)
-
+		
 		obstacle.enableBody = true
 		obstacle.body.colliderWorldBounds = true
 		obstacle.body.immovable = true
@@ -115,16 +134,45 @@ play.prototype = {
 		obstacle.scale.setTo(sizex, sizey)
 		obstacle.body.velocity.y = -speed
 		obstacle.has_given_point = has_given_point
-
+		
 		obstacle.checkWorldBounds = true;
 		// Kill obstacle/enemy if vertically out of bounds
 		obstacle.events.onOutOfBounds.add(this.killObstacle, this);
-
+		
 		obstacle.outOfBoundsKill = true;
 		//console.log(this.obstacles);
 	},
+	killObstacle: function (obstacle) {
+		this.obstacles.remove(obstacle);
+	},
+	obstacleCollision: function () {
+		// iterate over the children of obstacles
+		for (var i = 0; i < this.obstacles.length; i++) {
+			// find overlap
+			if (Phaser.Rectangle.intersects(this.player.getBounds(), this.obstacles.children[i])) {
+				this.hitObstacle(this.obstacles.children[i])
+			}
+			else if(this.obstacles.children[i].visible && this.obstacles.children[i].key == 'obstacle') {
+				this.obstaclePassed(this.obstacles.children[i])
+			}
+		}
+	},
+	obstaclePassed: function (obstacle) {
+		//console.log(this.obstacles)
+		var point = 0;
+
+		let py = this.player.y;
+		let oy = obstacle.y;
+		let ox = obstacle.x;
+
+		//if player is below obstacle and within 5 pixels and choose only one of the pair
+		if(py > oy && Math.abs(py-oy) < 5/* && ox < this.game.width/2*/){
+			point++;
+			this.sound.score.play('', 0, 0.5, false)
+		}
+		this.game.global.score += point;
+	},
 	hitObstacle: function(obstacle) {
-		console.log(obstacle)
 		// player hits lethal obstacle
 		if (obstacle.key == 'obstacle') {
 			this.killPlayer(this.player)
@@ -134,56 +182,29 @@ play.prototype = {
 			this.getCollectable(obstacle)
 		}
 	},
-	killObstacle: function (obstacle) {
-		//console.log(obstacle);
-		this.obstacles.remove(obstacle);
-		//console.log(this.obstacles.children.length);
-	},
-	getCollectable: function (obstacle) {
-		if (obstacle.key == 'coin') {
-			this.game.global.score += this.scorePoint(30)
-		}
-		if (obstacle.key == 'star') {
-			this.game.global.score += this.scorePoint(50)
-		}
-	},
-	scorePoint: function (i = 0) {
-		//console.log(this.obstacles)
-		var point = i;
-		var obstacles = this.obstacles.children;
-
-		for(var i=0;i<obstacles.length;i++){
-			if(obstacles[i].visible){
-				// console.log("vis: ")
-				// console.log(obstacles[i].y,this.player.y);
-				let py = this.player.y;
-				let oy = obstacles[i].y;
-				let ox = obstacles[i].x;
-
-				//if player is below obstacle and within 5 pixels and choose only one of the pair
-				if(py > oy && Math.abs(py-oy) < 5 && ox < this.game.width/2){
-					point++;
-					this.sound.score.play('', 0, 0.5, false)
-				}
-			}
-		}
-		return point;
-	},
-
 	killPlayer: function (player) {
-
 		//issues with this
 		//this.game.plugins.screenShake.shake(20);
 		this.sound.kill.play('', 0, 0.5, false)
-		// player.kill();
-		// this.game.state.start('gameOver');
-
+		this.player.kill();
+		this.game.state.start('gameOver');
+		
 	},
-	
-
+	getCollectable: function (obstacle) {
+		if (obstacle.key == 'coin') {
+			this.scorePoint(30, obstacle)
+		}
+		if (obstacle.key == 'star') {
+			this.scorePoint(50, obstacle)
+		}
+		obstacle.destroy()
+	},
+	scorePoint: function (point = 0, obstacle) {
+		this.sound.score.play('', 0, 0.5, false)
+		this.game.global.score += point;
+	},
 	// Tap on touchscreen or click with mouse
 	onDown: function (pointer) {},
-
 	// Move player
 	move: function () {
 		if (this.game.input.activePointer.isDown) {
@@ -256,5 +277,5 @@ play.prototype = {
 				this.game.debug.body(obstacles[i])
 			}
 		}
-	},
+	}
 }
