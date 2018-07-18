@@ -3,9 +3,9 @@
 // -   Assignment 3
 // +	Obstacles changed to random items not in pairs.
 // +	An obstacle randomly starts at bottom of screen and moves up at some random 'x'.
-// -	Count a point for each obstacle passed.
-// -	Kill individual if they collide with obstacle.
-// -	Items should not all be the same!
+// +	Count a point for each obstacle passed.
+// +	Kill individual if they collide with obstacle.
+// +	Items should not all be the same!
 
 
 
@@ -53,7 +53,7 @@ play.prototype = {
 		this.obstacles = this.game.add.group()
 
 		// Player
-		this.player = this.game.add.sprite(this.game.width / 2, 250, 'player')
+		this.player = this.game.add.sprite(this.game.width / 2, 250, 'beam', 0)
 		this.game.physics.enable(this.player, Phaser.Physics.ARCADE)
 		this.player.enableBody = true
 		this.player.body.collideWorldBounds = true

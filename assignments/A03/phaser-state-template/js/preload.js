@@ -19,6 +19,8 @@ preload.prototype = {
 		this.load.image('bg', 'images/cream.png')
 		this.load.spritesheet('coin', 'images/coinAnimated.png', 38, 32);
 		this.load.spritesheet('star', 'images/star.png', 24, 22);
+		//this.load.spritesheet('beam', 'images/kamehamehaWave.png', 85, 88)
+		//this.load.image('trail', 'images/beamTrail.jpg')
 		// audio
 		this.load.audio('bg_spin', 'sounds/spin_bg_music.mp3')
 		this.load.audio('bg_edm', 'sounds/edm_bg_music.mp3')

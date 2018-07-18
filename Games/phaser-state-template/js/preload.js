@@ -13,12 +13,13 @@ preload.prototype = {
 		
 		// game entities/world
 		//this.load.image('player', 'images/player_x1.png')
-		this.load.image('player', 'images/parachute.png')
+		//this.load.image('player', 'images/parachute.png')
 		this.load.image('obstacle', 'images/platform_thin_x7.png')
 		this.load.image('pause', 'images/pause.png')
 		this.load.image('bg', 'images/cream.png')
 		this.load.spritesheet('coin', 'images/coinAnimated.png', 38, 32);
 		this.load.spritesheet('star', 'images/star.png', 24, 22);
+		this.load.spritesheet('beam', 'images/kamehamehaWave.png', 255, 176)
 		// audio
 		this.load.audio('bg_spin', 'sounds/spin_bg_music.mp3')
 		this.load.audio('bg_edm', 'sounds/edm_bg_music.mp3')
