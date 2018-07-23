@@ -10,7 +10,7 @@ gameOver.prototype = {
 
 		var w = this.game.width
 		var h = this.game.height
-
+		this.game.beam.emptyFighters()
 		// Title
 		var logo = this.game.add.bitmapText(w/2, -100, 'fontUsed', '', 75)
 		logo.text = GAMETITLE
@@ -38,7 +38,7 @@ gameOver.prototype = {
 		}
 
 		this.game.input.onDown.add(listener, this)
-		console.log(this);
+		//console.log(this);
 		function listener(game)
 		{
 			this.game.sound.stopAll();

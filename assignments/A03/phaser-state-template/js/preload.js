@@ -13,13 +13,17 @@ preload.prototype = {
 		
 		// game entities/world
 		//this.load.image('player', 'images/player_x1.png')
-		this.load.image('player', 'images/parachute.png')
+		//this.load.image('player', 'images/parachute.png')
 		this.load.image('obstacle', 'images/platform_thin_x7.png')
 		this.load.image('pause', 'images/pause.png')
 		this.load.image('bg', 'images/cream.png')
 		this.load.spritesheet('coin', 'images/coinAnimated.png', 38, 32);
 		this.load.spritesheet('star', 'images/star.png', 24, 22);
-		//this.load.spritesheet('beam', 'images/kamehamehaWave.png', 85, 88)
+		this.load.spritesheet('beam', 'images/kamehamehaWave.png', 85, 88)
+		this.load.spritesheet('nappa', 'images/Fighters/NappaSS.png', 42, 42) 
+		this.load.spritesheet('explosionAnim', 'images/explosion.png', 91, 80)
+		//this.load.atlas('nappa', 'images/Fighters/Nappa.png', 'images/Fighters/Nappa.json')
+		//this.beam.preload(?????)
 		//this.load.image('trail', 'images/beamTrail.jpg')
 		// audio
 		this.load.audio('bg_spin', 'sounds/spin_bg_music.mp3')
@@ -27,6 +31,7 @@ preload.prototype = {
 		this.load.audio('score', 'sounds/score.wav')
 		this.load.audio('kill', 'sounds/kill.ogg')
 		this.load.audio('music', 'sounds/abstractionRapidAcrobatics.wav')
+		this.load.audio('boom', 'sounds/explosion.wav')
 
 		// font
 		this.game.load.bitmapFont('fontUsed', 'font/ganonwhite/font.png', 'font/ganonwhite/font.xml');

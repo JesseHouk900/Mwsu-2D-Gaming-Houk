@@ -9,12 +9,15 @@ function main()
 {
 	console.log("game.js")
 	var game = new Phaser.Game(450, 550, Phaser.Canvas, "game")
+	game.beam = new Player(game)
 
 	game.global = {
 		score:0,
 		best_score:0,
 		obstacle_id:0
 	}
+	game.explosions = []
+	game.expAnims = []
 
 	game.state.add("boot", boot)
 	game.state.add("preload", preload)

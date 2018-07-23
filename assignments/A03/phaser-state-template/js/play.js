@@ -1,21 +1,24 @@
 // -    Jesse Houk
 // -      7-18-18
-// -   Assignment 3
+// -   Assignment 3 & 4
 // +	Obstacles changed to random items not in pairs.
 // +	An obstacle randomly starts at bottom of screen and moves up at some random 'x'.
 // +	Count a point for each obstacle passed.
 // +	Kill individual if they collide with obstacle.
 // +	Items should not all be the same!
+// +    As score increases speed of obstacles increases
+// +	As score increases, frequency of obstacles increases
+// +	The player sprite has the ability to shoot bullets
+// +	Bullets colliding with obstacles destroys obstacles
+// +	Animation plays when obstacle is destroyed
+// +	Sound plays when obstacle is destroyed
+// +	Score is increased as objects are destroyed
+// +	Score no longer based on passing objects
+// +	As difficulty increases, points for destroying objects increases
 
 
 
-
-var play = function () {}
-
-// For debugging purposes, uncomment the following line
-//var obstacles = []
-
-play.prototype = {
+var play = {
 	//bmd: this.game.add.bitmapData(this.game.width, this.game.height),
 	create: function () {
 		console.log("play.js");
@@ -24,20 +27,14 @@ play.prototype = {
 		h = this.game.height
 
 		frame_counter = 0
-
 		random_gap = 0
-
 		item_difficulty = 30
 		speed_difficulty = -20
+		pts = []
 		// Bg color
 		this.game.stage.backgroundColor = BG_COLOR
 		// Bg image
 		this.bg = this.game.add.image(0, 0, 'bg')
-		//bmd.addToWorld()
-		//var area = new Phaser.Rectangle(0, 85, 88, 16)
-		//bmd.copyRect('trail', area, 300, 0)
-		// Platform width
-		platform_width = this.game.cache.getImage('obstacle').width
 
 		// Score sound
 		this.sound.score = this.game.add.audio('score')
@@ -46,76 +43,55 @@ play.prototype = {
 		// Death sound
 		this.sound.kill = this.game.add.audio('kill')
 
+		// Explosions sound
+		this.sound.boom = this.game.add.audio('boom')
+
 		// Music
 		this.music = this.game.add.audio('music')
 		this.music.play('', 0, 0.5, true)
-
 		this.physics.startSystem(Phaser.Physics.ARCADE)
 
+		// Player
+		this.game.beam.create()
 		// Obstacles
 		this.obstacles = this.game.add.group()
-
-		// Player
-		this.player = this.game.add.sprite(this.game.width / 2, 250, 'player', 0)
-		this.game.physics.enable(this.player, Phaser.Physics.ARCADE)
-		this.player.enableBody = true
-		this.player.body.collideWorldBounds = true
-		this.player.scale.setTo(.5, .5)
-		this.player.anchor.setTo(.5, .5)
-		this.player.body.setSize(this.player.width-10,this.player.height)
-		console.log(this.player)
 		// Score label
 		this.bmpText = this.game.add.bitmapText(this.game.width / 2, 100, 'fontUsed', '', 150);
 		this.bmpText.anchor.setTo(.5, .5)
 		this.bmpText.scale.setTo(.3, .3)
-
 		// Support for mouse click and touchscreen input
 		this.game.input.onDown.add(this.onDown, this)
-
+		//this.game.input.
 		this.pauseAndUnpause(this.game)
 	},
-
+	
 	update: function () {
 		this.bmpText.text = this.game.global.score
 		this.updatePlayer()
 		// Collision
 		this.obstacleCollision()
-		//this.game.physics.arcade.collide(this.player, this.obstacles, this.hitObstacle, null, this)
-////***
 		// Spawn enemies
 		random_gap = this.game.rnd.integerInRange(0, 1000)
+		// Higher the frequency of objects spawning (item_difficulty) the more often items spawn
 		if (random_gap % item_difficulty > random_gap / 2) {
-			var gap = 120
-			var offset = (Math.random() < 0.5 ? -1 : 1) * Math.random() * (150)
 			var new_objects = Math.floor(this.game.rnd.integerInRange(0, item_difficulty) / 15)
+			//console.log(new_objects)
 			for (var i = 0; i < new_objects; i++) {
-				this.spawnObstacle(/*entity number*/this.game.global.obstacle_id++,/*x*/ /*w / 2 + offset / 2 + offset*/ this.game.rnd.realInRange(0, this.game.width),/*y*/ this.game.height, /*speed*/ this.game.rnd.integerInRange(100, 400) + speed_difficulty, has_given_point = false)
-				//this.spawnObstacle(this.game.global.obstacle_id++, w / 2 + platform_width / 2/* + gap / 2 */+ offset, this.game.height, /*speed = 200*/ game.rnd.integerInRange(100, 400), has_given_point = true)
+				this.spawnObstacle(/*entity number*/this.game.global.obstacle_id++,/*x*/ this.game.rnd.realInRange(0, this.game.width),/*y*/ this.game.height, /*speed*/ this.game.rnd.integerInRange(100, 400) + speed_difficulty, has_given_point = false)
 			}
 		}
-////***
-		this.move();
-		
 		frame_counter++
-		if (frame_counter % 85 == 0) {
-			item_difficulty++
-		}
-		if (frame_counter % 45 == 0) {
-			speed_difficulty += 5
-		}
-		//this.game.global.score += this.scorePoint();
 	},
 	updatePlayer: function () {
-		if (this.player.animations.currentFrame.index == 0) {
-			this.player.body.setSize(61, 70, 14, 9)
-		}
-		else if (this.player.animations.currentFrame.index == 1) {
-			this.player.body.setSize(83, 86, 1, 1)
-		}
-		else if (this.player.animations.currentFrame.index == 2) {
-			this.player.body.setSize(40, 33, 23, 28)
-		}
-		//bmd.copyRect('trail', area, 0)
+		// update player sprite
+		this.game.beam.update()
+		// check if the player has shot a bullet, if so, make one
+		this.game.beam.checkShoot()
+		// update position and check collison of bullet
+		this.pts = this.updateFighters()
+		this.game.global.score += this.sumPoints()
+		// check if the player sprite has been moved by user
+		this.game.beam.move();
 	},
 	spawnObstacle: function (entity, x, y, speed,has_given_point) {
 		var obstacle
@@ -163,19 +139,19 @@ play.prototype = {
 		// iterate over the children of obstacles
 		for (var i = 0; i < this.obstacles.length; i++) {
 			// find overlap
-			if (Phaser.Rectangle.intersects(this.player.getBounds(), this.obstacles.children[i])) {
+			if (Phaser.Rectangle.intersects(this.game.beam.player.getBounds(), this.obstacles.children[i])) {
 				this.hitObstacle(this.obstacles.children[i])
 			}
-			else if(this.obstacles.children[i].visible && this.obstacles.children[i].key == 'obstacle') {
-				this.obstaclePassed(this.obstacles.children[i])
-			}
+			// else if(this.obstacles.children[i].visible && this.obstacles.children[i].key == 'obstacle') {
+			// 	this.obstaclePassed(this.obstacles.children[i])
+			// }
 		}
 	},
 	obstaclePassed: function (obstacle) {
 		//console.log(this.obstacles)
 		var point = 0;
 
-		let py = this.player.y;
+		let py = this.game.beam.player.y;
 		let oy = obstacle.y;
 		let ox = obstacle.x;
 
@@ -189,76 +165,40 @@ play.prototype = {
 	hitObstacle: function(obstacle) {
 		// player hits lethal obstacle
 		if (obstacle.key == 'obstacle') {
-			this.killPlayer(this.player)
+			this.game.beam.killPlayer()
 		}
 		// player hits collectable
 		else if (obstacle.key == 'coin' || obstacle.key == 'star') {
 			this.getCollectable(obstacle)
 		}
 	},
-	killPlayer: function (player) {
-		//issues with this
-		//this.game.plugins.screenShake.shake(20);
-		this.sound.kill.play('', 0, 0.5, false)
-		this.player.kill();
-		this.game.state.start('gameOver');
-		
-	},
 	getCollectable: function (obstacle) {
 		if (obstacle.key == 'coin') {
-			this.scorePoint(30, obstacle)
+			this.scorePoint(5, obstacle)
 		}
 		if (obstacle.key == 'star') {
-			this.scorePoint(50, obstacle)
+			this.scorePoint(10, obstacle)
 		}
 		obstacle.destroy()
 	},
 	scorePoint: function (point = 0, obstacle) {
 		this.sound.score.play('', 0, 0.5, false)
+		var s = this.game.global.score
+		//console.log('s: ' + speed_difficulty)
+		//console.log('i: ' + item_difficulty)
+		// As score increases, speed of obstacles increase
+		speed_difficulty = s % (s / 10)
+		var r = s / (7 * (s % 7))
+		// As score increases, frequency of obstacles increases
+		item_difficulty += (s%2 == 0) ? r : -1 / s
 		this.game.global.score += point;
 	},
 	// Tap on touchscreen or click with mouse
 	onDown: function (pointer) {},
-	// Move player
-	move: function () {
-		if (this.game.input.activePointer.isDown) {
-			//console.log(this.game.input.x);
-			let rate = this.moveSpeed(this.game.input.x,this.player.x);
-			let angle= this.moveAngle(rate,3);
-			//console.log("rate: " + rate);
-			this.player.x += rate;
-			this.player.angle = angle;
-		} else {
-			this.player.angle = 0;
-		}
-	},
-	moveAngle: function(rate,factor){
-		
-			return rate * factor;
-	},
-
-	moveSpeed: function(x,width,skill=2){
-		var ratio = 0;
-
-		if(x < width){
-			ratio = x/(width);
-			ratio *=10;
-			ratio = Math.ceil(ratio);
-			ratio /=2;
-			rate = (5 - ratio) * -1;
-		}else{
-			ratio = x/width;
-			ratio *=10;
-			ratio = Math.ceil(ratio);
-			ratio /=2;
-			rate = ratio;
-		}
-		//console.log(rate*skill);
-		return rate*skill;
-	},
 
 	pauseAndUnpause: function (game) {
 		var pause_button = this.game.add.sprite(this.game.width - 40, 40, 'pause')
+		var pause_watermark
 		pause_button.anchor.setTo(.5, .5)
 		pause_button.inputEnabled = true
 		// pause:
@@ -280,7 +220,13 @@ play.prototype = {
 				}
 			}, self)
 	},
-
+	updateFighters: function() {
+		for (var i = 0; i < this.obstacles.length; i++) {
+			if (this.obstacles.children[i].key == 'obstacle') {
+				this.game.beam.updateFighters(this.obstacles.children[i])
+			}
+		}
+	},
 	render: function () {
 		debug = false
 		if (debug) {
@@ -291,5 +237,12 @@ play.prototype = {
 				this.game.debug.body(obstacles[i])
 			}
 		}
+	},
+	sumPoints: function () {
+		let t = 0
+		for (var i = 0; i < pts.length; i++) {
+			t += pts[i]
+		}
+		return t
 	}
 }
