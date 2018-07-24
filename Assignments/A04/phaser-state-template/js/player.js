@@ -27,6 +27,8 @@ function Player(gameCopy) {
         shootKey = game.input.keyboard.addKeys(fKey)
         // Prevent unintentional browser actions
         game.input.keyboard.addKeyCapture(fKey)
+        //this.makeTrail()
+
     }
     this.update = function() {
         if (this.player.animations.currentFrame.index == 0) {
@@ -124,11 +126,11 @@ function Player(gameCopy) {
 		return rate*skill;
     }
     this.makeTrail = function() {
-        this.trail = game.add.emitter(this.player.x, this.player.y - 22, 200)
+        this.trail = game.add.emitter(this.player.x, this.player.y - 22, 20)
 		this.trail.width = 1
 		this.trail.makeParticles('beam', [3])
 		this.trail.setXSpeed(0)
-		this.trail.setYSpeed(-200, -180)
+		this.trail.setYSpeed(-400, -360)
 		this.trail.setRotation(50, -50)
 		this.trail.gravity = 0
 		this.trail.setAlpha(1, 0.01, 800)

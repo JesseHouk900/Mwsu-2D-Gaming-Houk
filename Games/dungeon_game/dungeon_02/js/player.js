@@ -7,7 +7,6 @@ function Player(gameCopy) {
     // this.preload = function() {
 
     // }
-
     this.create = function () {
         this.player_speed = 200
         this.player_run_multiplier = 1.5
@@ -166,6 +165,7 @@ function Player(gameCopy) {
         this.player.animations.add(keyName + dir, Phaser.Animation.generateFrameNames(atlasName + dir, iBegin, iEnd), fRate, loop);
 		
     }
+    //************** only works at beginning
     this.checkDeath = function() {
         if (game.input.activePointer.isDown && this.player.input.pointerOver()) {
             this.playerDeath()

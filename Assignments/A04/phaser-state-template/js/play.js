@@ -172,12 +172,12 @@ var play = {
 		}
 	},
 	getCollectable: function (obstacle) {
-		if (obstacle.key == 'coin') {
-			this.scorePoint(5, obstacle)
-		}
-		if (obstacle.key == 'star') {
-			this.scorePoint(10, obstacle)
-		}
+		// if (obstacle.key == 'coin') {
+		// 	this.scorePoint(5, obstacle)
+		// }
+		// if (obstacle.key == 'star') {
+		// 	this.scorePoint(10, obstacle)
+		// }
 		obstacle.destroy()
 	},
 	scorePoint: function (point = 0, obstacle) {
