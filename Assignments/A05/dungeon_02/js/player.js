@@ -1,9 +1,18 @@
+// + Run   (shift key)
+// + Die
+// + Attack (left mouse)
+// + Jump (space bar)
+// + Jump Attack (space left mouse)
 function Player(gameCopy) {
     var game = gameCopy
     this.player
     this.player_speed
     this.player_run_multiplier
     this.jumping
+    this.jumpWasPressed
+    this.attackWasPressed
+    this.playerDying
+    this.playerLives
     // this.preload = function() {
 
     // }
@@ -42,19 +51,24 @@ function Player(gameCopy) {
         // Jump Attack
         this.makeAnimation(animationNames[12], animationNames[13], 'left', 0, 9, 20, true)
         this.makeAnimation(animationNames[12], animationNames[13], 'right', 0, 9, 20, true)
-        
+       
         this.jumping = false
         this.player.animations.play('idle_left')
 		// turn physics on for player
 		game.physics.arcade.enable(this.player);
         this.player.inputEnabled = true
 		// set the anchor for sprite to middle of the view
-		this.player.anchor.setTo(0.5, 0.5);
+        this.player.anchor.setTo(0.5, 0.5);
+        this.prevDir = 'left'
+        this.playerDying = false
+        this.playerLives = 1
 
     }
 
     this.update = function () {
-        this.checkKeys()
+        if (!this.playerDying) {
+            this.checkKeys()
+        }
         this.checkDeath()
     }
 
@@ -65,18 +79,23 @@ function Player(gameCopy) {
 		// face the correct way when stopped.
 
         //console.log(this.jumping)
-        if (this.spaceBar.isDown) {
-            //if (this.jumping === false) {
-                console.log(this.spaceBar)
-                this.spaceBar.onDown.addOnce(this.playerJump, this)
-                //console.log(this.player.scale.x )
-            //}
+        this.checkFlags()
+        
+        // if (this.jumpWasPressed && this.attackWasPressed && !this.player.input.pointerOver()) {
+        //     this.playerJump
+        // }
+        if (this.jumpWasPressed) {
+            this.playerJump()
         }
-        else if (this.jumping == false) {
+        else if (this.attackWasPressed && !this.player.input.pointerOver()) {
+            this.playerAttack()
+            
+        }
+        else/* if (this.jumping == false) */{
             // Use the shift key to add running by changing speed and animation
             if (this.shiftKey.isDown) {
                 var animation = 'run_'
-                console.log("\"running\"")
+                //console.log("\"running\"")
                 if (this.leftKey.isDown) {
                     this.movePlayerHorizontal(-this.player_speed * this.player_run_multiplier, animation, 'left')
                 }
@@ -106,12 +125,21 @@ function Player(gameCopy) {
                     this.movePlayerVertical(this.player_speed, animation, this.prevDir)
                 }
             }
-            if (!this.leftKey.isDown && !this.rightKey.isDown && !this.upKey.isDown && !this.downKey.isDown) {
+            if (this.leftKey.isUp && this.rightKey.isUp && this.upKey.isUp && this.downKey.isUp) {
                 this.playerIdles(this.prevDir)
             }
         }
-        if (game.input.activePointer.isDown && !this.player.input.pointerOver()) {
-            this.playerAttack()
+    }
+
+    this.checkFlags = function () {
+
+        if (this.spaceBar.isDown) {
+            if(!this.jumpWasPressed) {
+                this.jumpWasPressed = true
+            }
+        }
+        if (game.input.activePointer.leftButton.justReleased()) {
+            this.attackWasPressed = true
         }
     }
     this.movePlayerHorizontal = function (speed, anim, dir) {
@@ -120,42 +148,95 @@ function Player(gameCopy) {
         this.player.animations.play(anim + dir);
         this.prevDir = dir
     }
+
     this.movePlayerVertical = function (speed, anim, dir) {
         this.player.animations.play(anim + dir)
         //this.player.body.velocity.x = 0
         this.player.body.velocity.y = speed;
     }
+
     this.playerIdles = function (dir = this.prevDir/*, player = this.player*/) {
         this.player.animations.play('idle_' + dir);
         this.player.body.velocity.x = 0;
         this.player.body.velocity.y = 0;
     }
-    //*************** Must hold space to complete animation
-    this.playerJump = function () {
-        this.player.animations.play('jump_' + this.prevDir)
-        //console.log('Bjumping: ' + this.jumping)
-        this.jumping = true
-        //console.log('Ajumping: ' + this.jumping)
-        //game.input.onDown.addOnce(this.playerAttack, this)
-        this.endJump()
-    }
-    this.playerJumpAttack = function () {
-        this.player.animations.play('jump_attack_' + this.prevDir)
-    }
-    this.endJump = function() {
-        //window.setTimeout(this.playerIdles(this.dir, this.player), 1000)
-        this.jumping = false
-    }
+
     this.playerAttack = function () {
         if (this.jumping == true) {
-            this.playJumpAttack()
+            this.playerJumpAttack()
         }
         else {
             this.playerGroundAttack()
         }
+        this.attackWasPressed = false
     }
+//************ jump goes further with attack
+    this.playerJump = function () {
+        this.jumping = true
+        if (this.attackWasPressed) {
+            this.playerAttack()
+        }
+        else {
+            this.jump()
+        }
+        
+    }
+
+    this.jump = function() {
+        this.player.animations.play('jump_' + this.prevDir)
+        this.player.animations._anims['jump_' + this.prevDir].onComplete.add(this.endJump)
+    }
+    
+    this.playerJumpAttack = function () {
+        this.player.animations.play('jump_attack_' + this.prevDir)
+        this.player.animations._anims['jump_attack_' + this.prevDir].onComplete.add(this.endJump)
+    }
+
+    // this.endJumpAttack = function () {
+    //     this.player.animations.play('idle' + this.prevDir)
+
+    // }.bind(this)
+
+    this.endJump = function() {
+        // console.log('sprite: ' + sprite)
+        // console.log(game)
+        //window.setTimeout(this.playerIdles(this.dir, this.player), 1000)
+        this.player.animations.play('idle_' + this.prevDir)
+        this.jumping = false
+        this.jumpWasPressed = false
+    }.bind(this)
+//**************** full animation not playing?
     this.playerGroundAttack = function () {
         this.player.animations.play('attack_' + this.prevDir)
+        //console.log(this.player.animations._anims['attack_' + this.prevDir])
+        this.player.animations._anims['attack_' + this.prevDir].onComplete.add(this.playerGroundAttackEnd)
+    }
+
+    this.playerGroundAttackEnd = function () {
+        this.player.animations.play('idle_' + this.prevDir)
+    }.bind(this)
+    
+    this.keysSetup = function () {
+		this.downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+		this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
+		this.leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+		this.rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+		this.spaceBar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        this.shiftKey = game.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
+    }
+
+    this.makeAnimation = function (keyName, atlasName, dir, iBegin, iEnd, fRate, loop){
+        this.player.animations.add(keyName + dir, Phaser.Animation.generateFrameNames(atlasName + dir, iBegin, iEnd), fRate, loop);
+		
+    }
+    //************** only works at beginning
+    this.checkDeath = function() {
+        if (this.attackWasPressed && this.player.input.pointerOver()) {
+            this.playerDying = true
+        }
+        if (this.playerDying && this.playerLives > 0) {
+            this.playerDeath()
+        }
     }
     //************** Always faces right
     this.playerDeath = function () {
@@ -165,24 +246,8 @@ function Player(gameCopy) {
         if (this.prevDir == 'left') {
             this.player.scale.x *= -1
         }
-    }
-    this.keysSetup = function () {
-		this.downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
-		this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
-		this.leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
-		this.rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
-		this.spaceBar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.shiftKey = game.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
-        //this.spaceBar.onDown_shouldPropagate = false
-    }
-    this.makeAnimation = function (keyName, atlasName, dir, iBegin, iEnd, fRate, loop){
-        this.player.animations.add(keyName + dir, Phaser.Animation.generateFrameNames(atlasName + dir, iBegin, iEnd), fRate, loop);
-		
-    }
-    //************** only works at beginning
-    this.checkDeath = function() {
-        if (game.input.activePointer.isDown && this.player.input.pointerOver()) {
-            this.playerDeath()
-        }
+        this.attackWasPressed = false
+        this.playerLives--
+        //this.playerDying = false
     }
 }

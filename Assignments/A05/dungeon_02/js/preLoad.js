@@ -24,7 +24,8 @@ var preLoad = {
 		//game.ufo.preLoad('atlasKey', 'path/to/atlas.png', 'path/to/atlas.json');
 		//game.load.spritesheet('spritesheetKey', 'path/to/sheet.png', frame_width, frame_height);
 		game.load.atlas('knight_atlas', 'assets/sprites/knight_atlas.png', 'assets/sprites/knight_atlas.json');
-
+		game.load.atlas('fire_ball_atlas', 'assets/sprites/fire_ball.png', 'assets/sprites/fire_ball.json')
+		
 		// load audio here: 
 		//////////////////////////////////////////////////////
 		//game.load.audio('audiokey1', 'path/to/sounds/one.mp3')
