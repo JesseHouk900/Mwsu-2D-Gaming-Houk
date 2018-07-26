@@ -37,14 +37,14 @@ var level_01 = {
 		this.map.addTilesetImage('amazonian', 'amazon')
 		this.map.addTilesetImage('corpse', 'skull_dark')
 		this.map.addTilesetImage('corpse 2', 'huge_animal')
-		this.map.addTilesetImage('ground', 'ground')
-		this.map.addTilesetImage('ground', 'ground')
-		this.map.addTilesetImage('ground', 'ground')
-		this.map.addTilesetImage('ground', 'ground')
-		this.map.addTilesetImage('ground', 'ground')
-		this.map.addTilesetImage('ground', 'ground')
-		this.map.addTilesetImage('ground', 'ground')
-		this.map.addTilesetImage('ground', 'ground')
+		this.map.addTilesetImage('rocks', 'rocks_2')
+		this.map.addTilesetImage('crystal', 'pink_crystal')
+		this.map.addTilesetImage('crystal 2', 'green_crystal')
+		this.map.addTilesetImage('huge animal', 'huge_animal2')
+		this.map.addTilesetImage('animal', 'animal')
+		this.map.addTilesetImage('undead', 'undead')
+		this.map.addTilesetImage('elements', 'elemental')
+		this.map.addTilesetImage('wall/rock', 'int_rock')
 		
 		this.prevDir = '';	// holds sprites previous direction (left , right) so
 		// we can face the correct direction when using the 'idle' animation

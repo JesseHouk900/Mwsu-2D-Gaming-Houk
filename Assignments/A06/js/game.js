@@ -14,13 +14,13 @@ game.global = {
     best_score: 0,
     level: 1,
     backgroundColor: "#000000",
-    current_level: "level_01"
+    current_level: "tunnel"
 }
 
 game.state.add("boot", boot);
 game.state.add("preLoad", preLoad);
 game.state.add("mainMenu", mainMenu);
-game.state.add("level_01", level_01);
+game.state.add("tunnel", level_01);
 game.state.add("level_02", level_02);
 game.state.add("level_03", level_03);
 game.state.add("level_04", level_04);
