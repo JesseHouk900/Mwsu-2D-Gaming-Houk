@@ -13,6 +13,7 @@ function Player(gameCopy) {
     this.attackWasPressed
     this.playerDying
     this.playerLives
+    this.playerKeys = {}
     // this.preload = function() {
 
     // }
@@ -66,6 +67,7 @@ function Player(gameCopy) {
     }
 
     this.update = function () {
+        //console.log(this.player.body.velocity['x'])
         if (!this.playerDying) {
             this.checkKeys()
         }
@@ -75,57 +77,35 @@ function Player(gameCopy) {
     this.checkKeys = function () {
 
 		// Each key changes the players velocity in the x or y direction
-		// and plays the proper animation. It sets the prevDir so we can
-		// face the correct way when stopped.
-
-        //console.log(this.jumping)
+		// and plays the proper animation. It sets the prevDir so we can face the correct way when stopped.
         this.checkFlags()
         
-        // if (this.jumpWasPressed && this.attackWasPressed && !this.player.input.pointerOver()) {
-        //     this.playerJump
-        // }
         if (this.jumpWasPressed) {
             this.playerJump()
         }
         else if (this.attackWasPressed && !this.player.input.pointerOver()) {
             this.playerAttack()
-            
         }
-        else/* if (this.jumping == false) */{
+        else {
             // Use the shift key to add running by changing speed and animation
-            if (this.shiftKey.isDown) {
+            if (this.playerKeys['shiftKey'].isDown) {
                 var animation = 'run_'
-                //console.log("\"running\"")
-                if (this.leftKey.isDown) {
-                    this.movePlayerHorizontal(-this.player_speed * this.player_run_multiplier, animation, 'left')
-                }
-                if (this.rightKey.isDown) {
-                    this.movePlayerHorizontal(this.player_speed * this.player_run_multiplier, animation, 'right')
-                }
-                if (this.upKey.isDown) {
-                    this.movePlayerVertical(-this.player_speed * this.player_run_multiplier, animation, this.prevDir)
-                }
-                if (this.downKey.isDown) {
-                    this.movePlayerVertical(this.player_speed * this.player_run_multiplier, animation, this.prevDir)
-                }
+                this.checkMoveDir(animation, 'left')
+                this.checkMoveDir(animation, 'right')
+                this.checkMoveDir(animation, 'up')
+                this.checkMoveDir(animation, 'down')
+                
             }
             // player is walking
             else {
-                var animation = 'walk_'
-                if (this.leftKey.isDown) {
-                    this.movePlayerHorizontal(-this.player_speed, animation, 'left')
-                }
-                if (this.rightKey.isDown) {
-                    this.movePlayerHorizontal(this.player_speed, animation, 'right')
-                }
-                if (this.upKey.isDown) {
-                    this.movePlayerVertical(-this.player_speed, animation, this.prevDir)
-                }
-                if (this.downKey.isDown) {
-                    this.movePlayerVertical(this.player_speed, animation, this.prevDir)
-                }
+                animation = 'walk_'
+                this.checkMoveDir(animation, 'left')
+                this.checkMoveDir(animation, 'right')
+                this.checkMoveDir(animation, 'up')
+                this.checkMoveDir(animation, 'down')
+                
             }
-            if (this.leftKey.isUp && this.rightKey.isUp && this.upKey.isUp && this.downKey.isUp) {
+            if (this.playerKeys['leftKey'].isUp && this.playerKeys['rightKey'].isUp && this.playerKeys['upKey'].isUp && this.playerKeys['downKey'].isUp) {
                 this.playerIdles(this.prevDir)
             }
         }
@@ -133,7 +113,7 @@ function Player(gameCopy) {
 
     this.checkFlags = function () {
 
-        if (this.spaceBar.isDown) {
+        if (this.playerKeys['spaceBar'].isDown) {
             if(!this.jumpWasPressed) {
                 this.jumpWasPressed = true
             }
@@ -142,20 +122,53 @@ function Player(gameCopy) {
             this.attackWasPressed = true
         }
     }
-    this.movePlayerHorizontal = function (speed, anim, dir) {
-        this.player.body.velocity.x = speed;
-        //this.player.body.velocity.y = 0
-        this.player.animations.play(anim + dir);
-        this.prevDir = dir
+
+    this.checkMoveDir = function (animation, dir) {
+        altDirs = []
+        let initDir = ''
+        let altDir = ''
+        if (dir == 'left' || dir == 'right') {
+            initDir = 'x'
+            altDir = 'y'
+            altDirs = ['up', 'down']
+        }
+        else if (dir == 'up' || dir == 'down') {
+            initDir = 'y'
+            altDir = 'x'
+            altDirs = ['left', 'right']
+        }
+        if (animation == 'run_') {
+            this.player_run_multiplier = 1.5
+        }
+        else if (animation == 'walk_') {
+            this.player_run_multiplier = 1
+        }
+        if (this.playerKeys[dir + 'Key'].isDown) {
+            speed = 0
+            if (dir == 'left' || dir == 'up') {
+                speed = -this.player_speed
+            }
+            else {
+                speed = this.player_speed
+            }
+            if (dir == 'left' || dir == 'right') {
+                this.prevDir = dir
+            }
+            this.player.body.velocity[initDir] = speed * this.player_run_multiplier
+            if (this.playerKeys[altDirs[0] + 'Key'].isDown) {
+                this.player.body.velocity[altDir] = -this.player_speed * this.player_run_multiplier
+            }
+            else if (this.playerKeys[altDirs[1] + 'Key'].isDown) {
+                this.player.body.velocity[altDir] = this.player_speed * this.player_run_multiplier
+            }
+            else {
+                this.player.body.velocity[altDir] = 0
+            }
+            this.player.animations.play(animation + this.prevDir)
+        }
     }
 
-    this.movePlayerVertical = function (speed, anim, dir) {
-        this.player.animations.play(anim + dir)
-        //this.player.body.velocity.x = 0
-        this.player.body.velocity.y = speed;
-    }
-
-    this.playerIdles = function (dir = this.prevDir/*, player = this.player*/) {
+    this.playerIdles = function (dir = this.prevDir) {
         this.player.animations.play('idle_' + dir);
         this.player.body.velocity.x = 0;
         this.player.body.velocity.y = 0;
@@ -192,15 +205,7 @@ function Player(gameCopy) {
         this.player.animations._anims['jump_attack_' + this.prevDir].onComplete.add(this.endJump)
     }
 
-    // this.endJumpAttack = function () {
-    //     this.player.animations.play('idle' + this.prevDir)
-
-    // }.bind(this)
-
     this.endJump = function() {
-        // console.log('sprite: ' + sprite)
-        // console.log(game)
-        //window.setTimeout(this.playerIdles(this.dir, this.player), 1000)
         this.player.animations.play('idle_' + this.prevDir)
         this.jumping = false
         this.jumpWasPressed = false
@@ -208,7 +213,6 @@ function Player(gameCopy) {
 //**************** full animation not playing?
     this.playerGroundAttack = function () {
         this.player.animations.play('attack_' + this.prevDir)
-        //console.log(this.player.animations._anims['attack_' + this.prevDir])
         this.player.animations._anims['attack_' + this.prevDir].onComplete.add(this.playerGroundAttackEnd)
     }
 
@@ -217,12 +221,12 @@ function Player(gameCopy) {
     }.bind(this)
     
     this.keysSetup = function () {
-		this.downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
-		this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
-		this.leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
-		this.rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
-		this.spaceBar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.shiftKey = game.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
+		this.playerKeys['downKey'] = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+		this.playerKeys['upKey'] = game.input.keyboard.addKey(Phaser.Keyboard.UP);
+		this.playerKeys['leftKey'] = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+		this.playerKeys['rightKey'] = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+		this.playerKeys['spaceBar'] = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        this.playerKeys['shiftKey'] = game.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
     }
 
     this.makeAnimation = function (keyName, atlasName, dir, iBegin, iEnd, fRate, loop){
