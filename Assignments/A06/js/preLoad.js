@@ -31,6 +31,7 @@ var preLoad = {
 		// load spritesheets here:
 		//////////////////////////////////////////////////////
 		game.load.spritesheet('portal_smoke', 'assets/sprites/smoke.png', 128, 128)
+		game.load.spritesheet('skeleton', 'assets/sprites/skeleton.png', 118, 228)
 		
 		// load audio here: 
 		//////////////////////////////////////////////////////
