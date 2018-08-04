@@ -21,16 +21,17 @@ var HUD = function (game, title = '', width, height, location = null) {
     
     this.create = function () {
         this.game.load.bitmapFont('mainFont', 'assets/fonts/ganonwhite/font.png', 'assets/fonts/ganonwhite/font.xml')
-        if (this.location == null) {
+        if (this.location = null) {
+            location = {}
             location['x'] = 0
             location['y'] = 0
         }
         this.makeTitle()
         this.createHUD()
-        this.displayHUD()
+        this.updateHUD()
     }
 
-    this.displayHUD = function () {
+    this.updateHUD = function () {
         for (var i = 0; i < this.hud_components.length; i++) {
             this.hud_components[i].destroy()
         }
@@ -52,13 +53,13 @@ var HUD = function (game, title = '', width, height, location = null) {
         if (this.title_text == '') {
             this.title_text = 'HUD'
         }
-        this.title = this.game.add.text(0, 0, this.title_text, this._getStyle("#FFF", this.font_size, true))
+        this.title = this.game.add.text(0, 0, this.title_text, this.getStyle("#FFF", this.font_size, true))
         this.title.setShadow(3, 3, 'fgba(0,0,0,0,5)', 2)
-        this.title.settextBounds(this.game.camera.x, this.game.camera.y, this.width, this.height)
+        this.title.setTextBounds(this.game.camera.x, this.game.camera.y, this.width, this.height)
         this.hud_components.push(this.title)
     }
 
-    this._getStyle= function (fill, f_size, bold = false) {
+    this.getStyle = function (fill, f_size, bold = false) {
         bold_text = ''
         if (bold) {
             bold_text = 'bold '
@@ -70,11 +71,20 @@ var HUD = function (game, title = '', width, height, location = null) {
     this.printItems = function () {
         for (var i = 0; i < this.items.length; i++) {
             if (this.items[i].data) {
-                value = this.items[i].player.data[this.items[i].key]
+                value = this.items[i].entity.data[this.items[i].key]
             }
             else {
-                value = this.items[i].player[this.items[i].key]
+                value = this.items[i].entity[this.items[i].key]
             }
+            item = this.game.add.text(0, 0, this.items[i].key + ':' + value, this.getStyle('#FFF', 20))
+            item.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2)
+            item.setTextBounds(this.game.camera.x, this.game.camera.y + ((i+1)*24), this.width, this.height)
+
+            this.hud_components.push(item)
         }
+    }
+
+    this.addItem = function (entity, key, data = false) {
+        this.items.push({'entity': entity, 'key': key, 'data': data})
     }
 }

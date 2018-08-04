@@ -1,9 +1,15 @@
 // todo:
-//     Add fireballs with cast button
-//     add attack to enemy
-//     add enimies/hazards
+//     add levels
 //     add level transitions
-//     add healthbars
+//     add coins, animated and unanimated with different score values
+// +   add healthbars
+//     add attack to enemy
+//     add hud to keep track of health and coins
+//     add enemies/hazards, more animations, more points
+//     add finish line with finish splash screen
+//
+//     make healthbars look better
+//     Add fireballs with cast button
 
 var game = new Phaser.Game(800, 650, Phaser.Canvas, "game");
 

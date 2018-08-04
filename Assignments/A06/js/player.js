@@ -1,8 +1,4 @@
-// + Run   (shift key)
-// + Die
-// + Attack (left mouse)
-// + Jump (space bar)
-// + Jump Attack (space left mouse)
+
 function Player(gameCopy) {
     var game = gameCopy
     this.player
@@ -14,10 +10,11 @@ function Player(gameCopy) {
     this.playerDying
     this.playerLives
     this.playerKeys = {}
+    this.gameOver = false
     // this.preload = function() {
 
     // }
-    this.create = function () {
+    this.create = function (health) {
         this.player_speed = 200
         this.player_run_multiplier = 1.5
         // Adding the knight atlas that contains all the animations
@@ -55,7 +52,7 @@ function Player(gameCopy) {
        
         this.jumping = false
         this.player.animations.play('idle_left')
-		// turn physics on for player
+		// turn physics on for player inside class
 		game.physics.arcade.enable(this.player);
         this.player.inputEnabled = true
 		// set the anchor for sprite to middle of the view
@@ -63,6 +60,10 @@ function Player(gameCopy) {
         this.prevDir = 'left'
         this.playerDying = false
         this.playerLives = 1
+        this.player.data['health'] = health
+        this.player.data['max_health'] = health
+        this.healthbar = new HealthBar()
+        this.healthbar.create(10)
 
     }
 
@@ -72,6 +73,7 @@ function Player(gameCopy) {
             this.checkKeys()
         }
         this.checkDeath()
+        this.healthbar.update(this.player)
     }
 
     this.checkKeys = function () {
@@ -90,6 +92,7 @@ function Player(gameCopy) {
             // Use the shift key to add running by changing speed and animation
             if (this.playerKeys['shiftKey'].isDown) {
                 var animation = 'run_'
+                //this.player_run_multiplier = 1.5
                 this.checkMoveDir(animation, 'left')
                 this.checkMoveDir(animation, 'right')
                 this.checkMoveDir(animation, 'up')
@@ -99,6 +102,8 @@ function Player(gameCopy) {
             // player is walking
             else {
                 animation = 'walk_'
+
+                //this.player_run_multiplier = 1
                 this.checkMoveDir(animation, 'left')
                 this.checkMoveDir(animation, 'right')
                 this.checkMoveDir(animation, 'up')
@@ -172,6 +177,7 @@ function Player(gameCopy) {
         this.player.animations.play('idle_' + dir);
         this.player.body.velocity.x = 0;
         this.player.body.velocity.y = 0;
+        
     }
 
     this.playerAttack = function () {
@@ -233,17 +239,27 @@ function Player(gameCopy) {
         this.player.animations.add(keyName + dir, Phaser.Animation.generateFrameNames(atlasName + dir, iBegin, iEnd), fRate, loop);
 		
     }
-    //************** only works at beginning
+
     this.checkDeath = function() {
         if (this.attackWasPressed && this.player.input.pointerOver()) {
             this.playerDying = true
         }
-        if (this.playerDying && this.playerLives > 0) {
+        if (this.playerDying && this.playerLives < 0) {
             this.playerDeath()
         }
     }
-    //************** Always faces right
+
+    this.checkLives = function () {
+        if (this.gameOver == false) {
+            if (this.player.data['health'] <= 0) {
+                this.playerDying = true
+                this.playerDeath()
+            }
+        }
+    }
+    // dies repeatedly
     this.playerDeath = function () {
+        this.playerLives--
         this.player.body.velocity.x = 0
         this.player.body.velocity.y = 0
         this.player.animations.play('death')
@@ -251,7 +267,9 @@ function Player(gameCopy) {
             this.player.scale.x *= -1
         }
         this.attackWasPressed = false
-        this.playerLives--
+        if (this.playerLives == 0) {
+            this.gameOver = true
+        }
         //this.playerDying = false
     }
 }

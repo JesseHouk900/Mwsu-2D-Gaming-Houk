@@ -61,41 +61,91 @@ var tunnel = {
 		
 		// this.map.setCollision(tile_index, true, this.layer.layer)
 		this.map.setCollision(1, true, this.layers.collision)
-		//this.map.setTileIndexCallback(45, this)
+		//this.map.setTileIndexCallback(1, this.hitWall, this)
 		console.log(this.map)
 		
 		this.layers.ground.resizeWorld()
 		
 		// create player object
 		this.player = new Player(game)
-		this.player.create()
+		this.player.create(100)
 		//this.game.camera.follow(this.player)
 		this.player.player.x = 1030
-		this.player.player.y = 1030
+		this.player.player.y = 1056
 		game.addPauseButton(game);
 		this.player.player.anchor.setTo(0.5)
 		game.camera.follow(this.player.player)
-		
+		//console.log(this.player)
 		// create enimies
-		//this.enemy1 = new Enemy(game)
-		// create parameters are the sprite, health
-		//this.enemy1.create(100)
-		//this.enemy2 = new Enemy(game)
-		//this.enemy2.create(100)
-		
+		// debugging
+		// this.enemy1.spawnEnemyAt(this.player.player.x +40, this.player.player.y, 'skeleton', 100)
+		this.enemy1 = new Enemy(game)
+		// create parameter is health
+		this.enemy1.create()
+		this.enemy2 = new Enemy(game)
+		this.enemy2.create()
+		console.log(this.player.player)
 		game.addPauseButton(game)
+		this.hud = new HUD(game, 'Player', 110, 410)
+		this.hud.addItem(this.player.player, 'health', true)
+		//this.hud.addItem(this.player.player, 'coins')
+		this.hud.create()
 	},
 	
 	update: function () {
+		//console.log('update')
 		this.player.update()
-		//this.enemy1.spawnEnemy(1, /*groundtile*/'skeleton')
-		//this.enemy2.spawnEnemy(1,/*otherGroundTile*/'zombie')
+		
+		if (this.enemy1.isSpawned) {
+			this.enemy1.update(this.player.player)
+		}
+		else {
+			this.enemy1.spawnEnemy(this, 4, 0, 'skeleton', 'left', 100)
+		}
+		if (this.enemy2.isSpawned) {
+			this.enemy2.update(this.player.player)
+		}
+		else {
+			this.enemy2.spawnEnemy(this, 27, 1, 'zombie', 'right', 100)
+		}
+		//console.log(this.player.player.animations.currentFrame)
+		// debugging
+		if (this.player.player.animations.currentFrame.name.includes('Idle')) {
+			//console.log(this.map)
+			//console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y, 32, 32, this.layers.terrain))
+			
+		}
+		this.hud.updateHUD()
+
+		// collision with walls
+		game.physics.arcade.collide(this.player.player, this.layers.collision)
+		game.physics.arcade.collide(this.enemy1.enemy, this.layers.collision)
+		game.physics.arcade.collide(this.enemy2.enemy, this.layers.collision)
+		// check enemy attack
+		game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
+		game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
 
 	},
 
+	hitWall: function () {
+		console.log('hitWall')
+		//this.player.player.velocity = 
+	},
+
 	render: function(){
-		game.debug.bodyInfo(this.player.player, 16, 24);
-		// Instructions:
-		game.debug.text( "Use arrow keys to move sprite around.", game.width/2, game.height-10 );
+		// game.debug.bodyInfo(this.player.player, 16, 24);
+		// // Instructions:
+		// game.debug.text( "Use arrow keys to move sprite around.", game.width/2, game.height-10 );
+	}, 
+
+	hurtPlayer: function() {
+		this.player.player.data['health'] -= 2
+		//console.log
+		this.killPlayer
+	},
+
+	killPlayer: function() {
+		//this.player.playerLives--
+		this.player.checkLives()
 	}
 }
