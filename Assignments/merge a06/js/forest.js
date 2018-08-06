@@ -5,12 +5,13 @@ var forest = {
     init_health: 0,
     init_coins: 0,
     init: function (player, health, coins) {
-        console.log(player)
+        //console.log(coins)
         this.player = player
+        this.player.player.animations.play('Idle_' + this.player.prevDir)
         this.init_health = health
         this.init_coins = coins
        // this.player.create(health)
-        console.log(this.player)
+        //console.log(this.player)
     },
 
     preload:function(){
@@ -36,7 +37,7 @@ var forest = {
         game.load.image('sheepfood','assets/tileset/logic/item/sheepfood.png');
         game.load.image('fairy','assets/tileset/logic/creature/fairy.png');
         game.load.image('resources','assets/tileset/logic/item/resources.png');
-        game.load.image('portal','assets/tileset/logic/portal.png');
+        //game.load.image('portal','assets/tileset/logic/portal.png');
         game.load.image('green_paving','assets/tileset/ground/green_paving.png');
         game.load.image('protection','assets/tileset/logic/protection.png');
     },
@@ -63,7 +64,7 @@ var forest = {
         this.map.addTilesetImage('sheepfood','sheepfood');
         this.map.addTilesetImage('fairy','fairy');
         this.map.addTilesetImage('Untitled','resources');
-        this.map.addTilesetImage('portal','portal');
+        //this.map.addTilesetImage('portal','portal');
         this.map.addTilesetImage('green_paving','green_paving');
         this.map.addTilesetImage('protection','protection');
         //map layers
@@ -85,10 +86,10 @@ var forest = {
         this.map.setCollision(322,true,this.layers.collision);
         //needs correct index
         //this.map.setTileIndexCallback(index,this.hitWall,this);
-
+        console.log(this.init_coins)
         this.player.create(this.init_health, this.init_coins)
-        this.player.player.x = 2101
-        this.player.player.y = 2270
+        this.player.player.x = 126 * 32
+        this.player.player.y = 95 * 32
 
         this.layers.ground_layer.resizeWorld();
         game.camera.follow(this.player.player)
@@ -101,14 +102,14 @@ var forest = {
         game.addPauseButton(game)
         
         this.hud = new HUD(game, 'Player', 110, 410)
-        this.items = []
-		for (var i = 0; i < 3; i++) {
+        this.hud.addItem(this.player.player, 'health', true)
 
-		this.items.push(new PickUp(game))
-		this.items[i].create('coin', 2101 - (48 * i), 2270)
-		}
-		this.hud.addItem(this.player.player, 'health', true)
-		//this.hud.addItem(this.player.player, 'coins')
+        this.coins = game.add.group()
+        this.addCoinsAlongX(4, 'coin', 99, 96)
+        this.addCoinsAlongX(10, 'coin_bag', 81, 72)
+        
+        this.hud.addItem(this.player.player, 'coins', true)
+        
 		this.hud.create()
         
     },
@@ -134,20 +135,23 @@ var forest = {
 		//console.log(this.player.player.animations.currentFrame)
 		// debugging
 		if (this.player.player.animations.currentFrame.name.includes('Idle')) {
-			console.log(this.player.player)
-			console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y, 32, 32, this.layers.terrain_layer))
+			// console.log(this.player.player)
+			// console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y, 32, 32, this.layers.terrain_layer))
 			
 		}
 		this.hud.updateHUD()
 
 		// collision with walls
-		//game.physics.arcade.collide(this.player.player, this.layers.collision)
+		game.physics.arcade.collide(this.player.player, this.layers.collision)
 		game.physics.arcade.collide(this.enemy1.enemy, this.layers.collision)
 		game.physics.arcade.collide(this.enemy2.enemy, this.layers.collision)
 		// check enemy attack
-		// game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
-		// game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
-		this.checkFinish()
+		game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
+        game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
+        
+        this.checkCoins()
+        this.checkFinish()
+        this.checkGameOver()
     },
 
     hurtPlayer: function() {
@@ -162,11 +166,12 @@ var forest = {
 	},
 
 	checkFinish: function () {
-        goal = this.map.getTileWorldXY(Math.round(this.player.player.x), Math.round(this.player.player.y) - 32, 32, 32, this.layers.terrain_layer)
+        goal = this.map.getTileWorldXY(Math.round(this.player.player.x), Math.round(this.player.player.y) - 64, 32, 32, this.layers.terrain_layer)
         //console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y - 32, 32, 32, this.layers.terrain_layer))
         if (goal != null && goal.index == 435) {
-			game.global.current_level = 'cave'
-			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'] /*, this.player.player.data['coins']*/)
+            game.global.current_level = 'finish'
+            game.global.level++
+			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'])
 		}
 	},
 
@@ -175,6 +180,38 @@ var forest = {
 		if (this.player.gameOver) {
 			game.global.current_level = 'gameOver'
 			game.state.start(game.global.current_level, true, true)
+		}
+	},
+    
+	checkCoins: function () {
+		for (var i = 0; i < this.coins.length; i++) {
+			//console.log('x: ' + this.coins.children[i].x + '          y: ' + this.coins.children[i].y)
+			if (Phaser.Rectangle.intersects(this.player.player.getBounds(), this.coins.children[i].getBounds())) {
+				this.pickUpItem(this.coins.children[i])
+			}
+
+		}
+    },
+    
+    pickUpItem: function (item) {
+		console.log(item)
+		if (item.key == 'coin') {
+			item.destroy()
+			this.player.player.data['coins']++
+        }
+        if (item.key == 'coin_bag') {
+            item.destroy()
+			this.player.player.data['coins'] += 5
+        }
+        // if (type == 'health') {}
+	},
+
+	addCoinsAlongX: function (num, name, start, y) {
+		for (var i = 0; i < num; i++) {
+			item = new PickUp(game)
+			item.create(name, (start * 32) + (48 * i), (32 * y))
+			this.coins.add(item.item)
+			//console.log(this.coins)
 		}
 	}
 }

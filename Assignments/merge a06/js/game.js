@@ -1,13 +1,14 @@
 // todo:
 // +   add levels
 // ~   add level transitions
-//     add coins, animated and unanimated with different score values
+// ~    add coins, animated and unanimated with different score values
 // +   add healthbars
 // ~   add attack to enemy
 // +   add hud to keep track of health and coins
 // ~   add enemies/hazards, more animations, more points
 //     add finish line with finish splash screen
 //
+//     make hitboxes tighter
 //     make healthbars look better
 //     Add fireballs with cast button
 
@@ -32,6 +33,7 @@ game.state.add("cave2", cave2);
 game.state.add("forest", forest);
 game.state.add("islands", islands);
 game.state.add("gameOver", gameOver);
+game.state.add("finish", finish)
 game.state.start("boot");
 
 /**

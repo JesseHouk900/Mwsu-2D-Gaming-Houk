@@ -42,8 +42,8 @@ var HUD = function (game, title = '', width, height, location = null) {
     }
 
     this.createHUD = function () {
-        this.hud.lineStyle(2, 0x111111, 1)
-        this.hud.beginFill(0x010101, .4)
+        this.hud.lineStyle(2, 0x000000, 1)
+        this.hud.beginFill(0x010101, .7)
         this.hud.drawRect(this.game.camera.x + 1, this.game.camera.y + 1, this.width, this.height)
         this.hud.endFill()
         this.hud_components.push(this.hud)

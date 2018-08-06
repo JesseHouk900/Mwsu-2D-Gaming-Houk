@@ -72,8 +72,8 @@ var tunnel = {
 		// create player object
 		this.player = new Player(game)
 		this.player.create(100)
-		this.player.player.x = 160
-		this.player.player.y = 1600
+		this.player.player.x = 53 * 32
+		this.player.player.y = 33 * 32
 		//game.addPauseButton(game);
 		this.player.player.anchor.setTo(0.5)
 		game.camera.follow(this.player.player)
@@ -86,22 +86,25 @@ var tunnel = {
 		this.enemy1.create()
 		this.enemy2 = new Enemy(game)
 		this.enemy2.create()
-		//console.log(this.player.player)
+
 		game.addPauseButton(game)
 		this.hud = new HUD(game, 'Player', 110, 410)
 		this.hud.addItem(this.player.player, 'health', true)
-		this.items = []
-		for (var i = 0; i < 3; i++) {
 
-		this.items.push(new PickUp(game))
-		this.items[i].create('coin', 160 + (48 * i), 1600)
-		}
-		this.hud.addItem(this.player.player, 'coins')
+		this.coins = game.add.group()
+		this.addCoinsAlongX(5, 'coin', 34, 32)
+		
+		this.addCoinsAlongX(10, 'coin', 7, 50)
+		this.addCoinsAlongX(3, 'shiningCoin', 27, 78)
+		this.addCoinsAlongX(3, 'shiningCoin', 27, 81)
+		this.addCoinsAlongX(3, 'shiningCoin', 27, 84)
+		this.hud.addItem(this.player.player, 'coins', true)
+
 		this.hud.create()
 	},
 	
 	update: function () {
-		
+		//console.log('update')
 		this.player.update()
 		
 		if (this.enemy1.isSpawned) {
@@ -130,22 +133,13 @@ var tunnel = {
 		game.physics.arcade.collide(this.enemy1.enemy, this.layers.collision)
 		game.physics.arcade.collide(this.enemy2.enemy, this.layers.collision)
 		// check enemy attack
-		// game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
-		// game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
+		game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
+		game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
+		// overlap with pick ups
+		this.checkCoins()
 		this.checkFinish()
 		this.checkGameOver()
 	},
-
-	hitWall: function () {
-		console.log('hitWall')
-		//this.player.player.velocity = 
-	},
-
-	render: function(){
-		// game.debug.bodyInfo(this.player.player, 16, 24);
-		// // Instructions:
-		// game.debug.text( "Use arrow keys to move sprite around.", game.width/2, game.height-10 );
-	}, 
 
 	hurtPlayer: function() {
 		this.player.player.data['health'] -= 2
@@ -161,6 +155,7 @@ var tunnel = {
 	checkFinish: function () {
 		if (Math.round(this.player.player.x / 32) < 3 && Math.round(this.player.player.y / 32) < 51 && Math.round(this.player.player.y / 32) > 48) {
 			game.global.current_level = 'forest'
+			game.global.level++
 			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'])
 		}
 	},
@@ -170,6 +165,38 @@ var tunnel = {
 		if (this.player.gameOver) {
 			game.global.current_level = 'gameOver'
 			game.state.start(game.global.current_level, true, true)
+		}
+	},
+
+	checkCoins: function () {
+		for (var i = 0; i < this.coins.length; i++) {
+			//console.log(this.coins.children[i])
+			if (Phaser.Rectangle.intersects(this.player.player.getBounds(), this.coins.children[i].getBounds())) {
+				this.pickUpItem(this.coins.children[i])
+			}
+
+		}
+	},
+
+	pickUpItem: function (item) {
+		console.log(item)
+		if (item.key == 'coin') {
+			item.destroy()
+			this.player.player.data['coins']++
+        }
+        if (item.key == 'shiningCoin') {
+            item.destroy()
+			this.player.player.data['coins'] += 5
+        }
+        // if (type == 'health') {}
+	},
+
+	addCoinsAlongX: function (num, name, start, y) {
+		for (var i = 0; i < num; i++) {
+			item = new PickUp(game)
+			item.create(name, (start * 32) + (48 * i), (32 * y))
+			this.coins.add(item.item)
+			//console.log(this.coins)
 		}
 	}
 }

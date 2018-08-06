@@ -120,11 +120,11 @@ var islands = {
 		// collision with walls
 		game.physics.arcade.collide(this.player.player, this.layers.collision)
 
-		game.physics.arcade.collide(this.enemy1.enemy, this.layers.collision)
-		game.physics.arcade.collide(this.enemy2.enemy, this.layers.collision)
-		// check enemy attack
-		game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
-		game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
+		// game.physics.arcade.collide(this.enemy1.enemy, this.layers.collision)
+		// game.physics.arcade.collide(this.enemy2.enemy, this.layers.collision)
+		// // check enemy attack
+		// game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
+		// game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
 
     },
     hitWall: function () {
