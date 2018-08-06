@@ -1,3 +1,6 @@
+// 27 on layer 1_terrain = small rock
+// 4 on layer 0_ground = dirt floor
+// collision is 1
 var tunnel = {
 
 	preload: function () {
@@ -62,17 +65,16 @@ var tunnel = {
 		// this.map.setCollision(tile_index, true, this.layer.layer)
 		this.map.setCollision(1, true, this.layers.collision)
 		//this.map.setTileIndexCallback(1, this.hitWall, this)
-		console.log(this.map)
+		//console.log(this.map)
 		
 		this.layers.ground.resizeWorld()
 		
 		// create player object
 		this.player = new Player(game)
 		this.player.create(100)
-		//this.game.camera.follow(this.player)
-		this.player.player.x = 1030
-		this.player.player.y = 1056
-		game.addPauseButton(game);
+		this.player.player.x = 160
+		this.player.player.y = 1600
+		//game.addPauseButton(game);
 		this.player.player.anchor.setTo(0.5)
 		game.camera.follow(this.player.player)
 		//console.log(this.player)
@@ -84,7 +86,7 @@ var tunnel = {
 		this.enemy1.create()
 		this.enemy2 = new Enemy(game)
 		this.enemy2.create()
-		console.log(this.player.player)
+		//console.log(this.player.player)
 		game.addPauseButton(game)
 		this.hud = new HUD(game, 'Player', 110, 410)
 		this.hud.addItem(this.player.player, 'health', true)
@@ -93,7 +95,7 @@ var tunnel = {
 	},
 	
 	update: function () {
-		//console.log('update')
+		
 		this.player.update()
 		
 		if (this.enemy1.isSpawned) {
@@ -110,21 +112,22 @@ var tunnel = {
 		}
 		//console.log(this.player.player.animations.currentFrame)
 		// debugging
+		//console.log('update')
 		if (this.player.player.animations.currentFrame.name.includes('Idle')) {
 			//console.log(this.map)
-			//console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y, 32, 32, this.layers.terrain))
+			//console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y/*, 32, 32, this.layers.terrain*/))
 			
 		}
 		this.hud.updateHUD()
-
 		// collision with walls
 		game.physics.arcade.collide(this.player.player, this.layers.collision)
 		game.physics.arcade.collide(this.enemy1.enemy, this.layers.collision)
 		game.physics.arcade.collide(this.enemy2.enemy, this.layers.collision)
 		// check enemy attack
-		game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
-		game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
-
+		// game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
+		// game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
+		this.checkFinish()
+		this.checkGameOver()
 	},
 
 	hitWall: function () {
@@ -141,11 +144,26 @@ var tunnel = {
 	hurtPlayer: function() {
 		this.player.player.data['health'] -= 2
 		//console.log
-		this.killPlayer
+		this.killPlayer()
 	},
 
 	killPlayer: function() {
 		//this.player.playerLives--
 		this.player.checkLives()
+	},
+
+	checkFinish: function () {
+		if (Math.round(this.player.player.x / 32) < 3 && Math.round(this.player.player.y / 32) < 51 && Math.round(this.player.player.y / 32) > 48) {
+			game.global.current_level = 'forest'
+			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'] /*, this.player.player.data['coins']*/)
+		}
+	},
+
+	checkGameOver: function () {
+		//console.log('death?')
+		if (this.player.gameOver) {
+			game.global.current_level = 'gameOver'
+			game.state.start(game.global.current_level, true, true)
+		}
 	}
 }

@@ -155,8 +155,9 @@ var forest = {
 	},
 
 	checkFinish: function () {
-        console.log(this.map.getTileWorldXY(Math.round(this.player.player.x), Math.round(this.player.player.y) - 32, 32, 32, this.layers.terrain_layer))
-        if (this.map.getTileWorldXY(Math.round(this.player.player.x), Math.round(this.player.player.y) - 32, 32, 32, this.layers.terrain_layer).index == 435) {
+        goal = this.map.getTileWorldXY(Math.round(this.player.player.x), Math.round(this.player.player.y) - 32, 32, 32, this.layers.terrain_layer)
+        //console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y - 32, 32, 32, this.layers.terrain_layer))
+        if (goal != null && goal.index == 435) {
 			game.global.current_level = 'cave'
 			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'] /*, this.player.player.data['coins']*/)
 		}

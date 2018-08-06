@@ -45,6 +45,7 @@ function Enemy(gameCopy) {
     this.update = function (player) {
         this.chasePlayer(player)
         this.healthbar.update(this.enemy)
+        //console.log('enemy Update')
     }
     // spawn an enemy randomly
     // Params: 
@@ -56,12 +57,12 @@ function Enemy(gameCopy) {
     // the health of the sprite
     this.spawnEnemy = function (level_state, index, layer_num = 0, sprite_name, sprite_dir = '', health) {
         if (!this.isSpawned) {
-            //console.log('spawning')
+            //console.log(this)
             invalidSpawn = true
             let x = 0
             let y = 0
             let spawn_radius = 1000
-            while (invalidSpawn) {
+            if (invalidSpawn) {
                 pxm = level_state.player.player.x - spawn_radius
                 pxh = level_state.player.player.x + spawn_radius
                 pym = level_state.player.player.y - spawn_radius
@@ -75,12 +76,15 @@ function Enemy(gameCopy) {
                 if (level_state.map.getTileWorldXY(x, y)) {
                     if (level_state.map.getTileWorldXY(x, y).index == index) {
                         invalidSpawn = false
+                        this.isSpawned = true
                     }
                 }
             }
-            //console.log('made it')
-            this.createEnemy(sprite_name, sprite_dir, x, y, health)
-            level_state.map.currentLayer = 0
+            if (this.isSpawned) {
+                console.log('made it')
+                this.createEnemy(sprite_name, sprite_dir, x, y, health)
+                level_state.map.currentLayer = 0
+            }
         }
     }
     // makes the sprite of an enemy and its animations
@@ -92,7 +96,6 @@ function Enemy(gameCopy) {
         //console.log('creating')
         this.enemy = game.add.sprite(x, y, sprite)
         this.makeAnimations(dir)
-        //console.log(this.enemy)
         game.physics.arcade.enable(this.enemy)
         if (sprite == 'skeleton') {
             this.enemy_scale = .25
@@ -101,11 +104,11 @@ function Enemy(gameCopy) {
             this.enemy_scale = .65
         }
         this.enemy.scale.setTo(this.enemy_scale)
-        this.isSpawned = true
         this.enemy.data['health'] = health
         this.enemy.data['max_health'] = health
         this.healthbar = new HealthBar()
         this.healthbar.create(5)
+        //console.log(this.enemy)
     }
     
     // debugging

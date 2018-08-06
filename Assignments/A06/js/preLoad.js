@@ -34,6 +34,8 @@ var preLoad = {
 		game.load.spritesheet('skeleton', 'assets/sprites/skeleton.png', 118, 228)
 		
 		game.load.spritesheet('zombie', 'assets/sprites/zombie.png', 50, 76)
+		// name is misleading, this is the sprite for worth less 'coin' points
+		game.load.spritesheet('coin', 'assets/sprites/coinAnimated', 37, 36)
 		// load audio here: 
 		//////////////////////////////////////////////////////
 		//game.load.audio('audiokey1', 'path/to/sounds/one.mp3')

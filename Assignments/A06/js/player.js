@@ -65,6 +65,8 @@ function Player(gameCopy) {
         this.healthbar = new HealthBar()
         this.healthbar.create(10)
 
+        this.player.data['coins'] = 0
+
     }
 
     this.update = function () {
@@ -235,6 +237,16 @@ function Player(gameCopy) {
         this.playerKeys['shiftKey'] = game.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
     }
 
+    this.pickUp = function (item) {
+        if (item == 'coin') {
+            this.player.data['coins']++
+        }
+        if (item == 'coin_bag') {
+            this.player.data['coins'] += 5
+        }
+        // if (item == 'health') {this.player.data['health'] += 10}
+    }
+
     this.makeAnimation = function (keyName, atlasName, dir, iBegin, iEnd, fRate, loop){
         this.player.animations.add(keyName + dir, Phaser.Animation.generateFrameNames(atlasName + dir, iBegin, iEnd), fRate, loop);
 		
@@ -259,6 +271,7 @@ function Player(gameCopy) {
     }
     // dies repeatedly
     this.playerDeath = function () {
+        //console.log('dying')
         this.playerLives--
         this.player.body.velocity.x = 0
         this.player.body.velocity.y = 0

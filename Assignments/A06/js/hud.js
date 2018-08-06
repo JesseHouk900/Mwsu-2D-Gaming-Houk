@@ -78,7 +78,7 @@ var HUD = function (game, title = '', width, height, location = null) {
             }
             item = this.game.add.text(0, 0, this.items[i].key + ':' + value, this.getStyle('#FFF', 20))
             item.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2)
-            item.setTextBounds(this.game.camera.x, this.game.camera.y + ((i+1)*24), this.width, this.height)
+            item.setTextBounds(this.game.camera.x + 24, this.game.camera.y + ((i+1)*24), this.width, this.height)
 
             this.hud_components.push(item)
         }

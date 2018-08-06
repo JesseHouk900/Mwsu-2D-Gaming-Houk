@@ -27,10 +27,10 @@ game.state.add("boot", boot);
 game.state.add("preLoad", preLoad);
 game.state.add("mainMenu", mainMenu);
 game.state.add("tunnel", tunnel);
-// game.state.add("cave", cave);
-// game.state.add("cave_2", cave_2);
-// game.state.add("level_04", level_04);
-// game.state.add("level_05", level_05);
+game.state.add("cave", cave);
+//game.state.add("cave_2", cave_2);
+game.state.add("forest", forest);
+//game.state.add("islands", islands);
 game.state.add("gameOver", gameOver);
 game.state.start("boot");
 

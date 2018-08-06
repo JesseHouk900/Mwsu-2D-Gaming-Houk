@@ -1,32 +1,39 @@
 var cave ={
+    init_health: 0,
+
+    init: function (player, health/*, coins*/) {
+        this.player = player
+        init_health = health
+    },
+    
     preload:function(){
         //loading tilemap
         game.load.tilemap('cave', 'assets/maps/cave.json', null, Phaser.Tilemap.TILED_JSON);
         //mapping tile .pngs
-        game.load.image('collision','tileset/logic/collision.png');
-        game.load.image('ground/brown','tileset/ground/brown.png');
-        game.load.image('rock/rocks_2','tileset/ground/rock/rocks_2.png');
-        game.load.image('floor_tiles','tileset/ground/indoor/floor_tiles.png');
-        game.load.image('rocks','tileset/ground/rock/rocks.png');
-        game.load.image('wall/int_rock','tileset/building/wall/int_rock.png');
-        game.load.image('purple_crystal','tileset/ground/rock/purplr_crystal.png');
-        game.load.image('stairs','tileset/building/stairs/stairs.png');
-        game.load.image('dark_stairs','tileset/building/stairs/dark_stairs.png');
-        game.load.image('blood/floor_stain','tileset/item/blood/floor_stain.png');
-        game.load.image('blood/nsew_stains','tileset/item/blood/nsew_stains.png');
-        game.load.image('corpse/skeleton','tileset/item/corpse/skeleton.png');
-        game.load.image('corpse/huge_animal','tileset/item/corpse/huge_animal.png');
-        game.load.image('skull_dark','tileset.item/corpse/skull_dark.png');
-        game.load.image('skull_pale','tileset.item/corpse/skull_pale.png');
-        game.load.image('broken_green_column','tileset/item/statue/broken_green_column.png');
-        game.load.image('blackened_column','tileset/item/statue/blackened_column.png');
-        game.load.image('mushroom3','tileset/plant/mushroom3.png');
-        game.load.image('star_shaped_plants','tileset/plant/star_shaped_plants.png');
-        game.load.image('portal','tileset/logic/portal.png');
-        game.load.image('creature/giant_human','tileset/logic/creature/giant_human.png');
-        game.load.image('creature/mutant','tileset/logic/creature/mutant.png');
-        game.load.image('creature/huge_animal','tileset/logic/creature/huge_animal.png');
-        game.load.image('ground/brown','tileset/ground/brown.png');
+        game.load.image('collision','assets/tileset/logic/collision.png');
+        game.load.image('ground/brown','assets/tileset/ground/brown.png');
+        game.load.image('rock/rocks_2','assets/tileset/ground/rock/rocks_2.png');
+        game.load.image('floor_tiles','assets/tileset/ground/indoor/floor_tiles.png');
+        game.load.image('rocks','assets/tileset/ground/rock/rocks.png');
+        game.load.image('wall/int_rock','assets/tileset/building/wall/int_rock.png');
+        game.load.image('purple_crystal','assets/tileset/ground/rock/purplr_crystal.png');
+        game.load.image('stairs','assets/tileset/building/stairs/stairs.png');
+        game.load.image('dark_stairs','assets/tileset/building/stairs/dark_stairs.png');
+        game.load.image('blood/floor_stain','assets/tileset/item/blood/floor_stain.png');
+        game.load.image('blood/nsew_stains','assets/tileset/item/blood/nsew_stains.png');
+        game.load.image('corpse/skeleton','assets/tileset/item/corpse/skeleton.png');
+        game.load.image('corpse/huge_animal','assets/tileset/item/corpse/huge_animal.png');
+        game.load.image('skull_dark','assets/tileset.item/corpse/skull_dark.png');
+        game.load.image('skull_pale','assets/tileset.item/corpse/skull_pale.png');
+        game.load.image('broken_green_column','assets/tileset/item/statue/broken_green_column.png');
+        game.load.image('blackened_column','assets/tileset/item/statue/blackened_column.png');
+        game.load.image('mushroom3','assets/tileset/plant/mushroom3.png');
+        game.load.image('star_shaped_plants','assets/tileset/plant/star_shaped_plants.png');
+        game.load.image('portal','assets/tileset/logic/portal.png');
+        game.load.image('creature/giant_human','assets/tileset/logic/creature/giant_human.png');
+        game.load.image('creature/mutant','assets/tileset/logic/creature/mutant.png');
+        game.load.image('creature/huge_animal','assets/tileset/logic/creature/huge_animal.png');
+        game.load.image('ground/brown','assets/tileset/ground/brown.png');
     },
 
     create: function(){
