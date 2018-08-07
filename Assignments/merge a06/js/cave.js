@@ -1,14 +1,21 @@
 var cave = {
     init_health: 0,
     init_coins: 0,
+    
     up: 0,
+    
     init: function (player, health, coins) {
-        //console.log(player)
-        this.player = player
-        this.init_health = health
-        this.init_coins = coins
-       // this.player.create(health)
-        //console.log(this.player)
+        if (game.global.debugging) {
+            //console.log(coins)
+            //console.log(this.player)
+            
+        }
+        else { 
+            this.player = player
+            this.player.player.animations.play('Idle_' + this.player.prevDir)
+            this.init_health = health
+            this.init_coins = coins
+        }
     },
 
     preload: function () {
@@ -34,7 +41,7 @@ var cave = {
         game.load.image('broken_green_column', 'assets/tileset/item/statue/broken_green_column.png');
         game.load.image('blackened_column', 'assets/tileset/item/statue/blackened_column.png');
         game.load.image('mushroom3', 'assets/tileset/plant/mushroom3.png');
-        game.load.image('star_shaped_plants', 'assets/tileset/plant/star_shaped_plants.png');
+        //game.load.image('star_shaped_plants', 'assets/tileset/plant/star_shaped_plants.png');
         game.load.image('portal', 'assets/tileset/logic/portal.png');
         game.load.image('creature/giant_human', 'assets/tileset/logic/creature/giant_human.png');
         game.load.image('creature/mutant', 'assets/tileset/logic/creature/mutant.png');
@@ -65,8 +72,8 @@ var cave = {
         this.map.addTilesetImage('broken_green_column', 'broken_green_column');
         this.map.addTilesetImage('blackened_column', 'blackened_column');
         this.map.addTilesetImage('mushroom3', 'mushroom3');
-        this.map.addTilesetImage('star_shaped_plant', 'star_shaped_plant');
-        this.map.addTilesetImage('portal', 'portal');
+        //this.map.addTilesetImage('star_shaped_plant', 'star_shaped_plant');
+        //this.map.addTilesetImage('portal', 'portal');
         this.map.addTilesetImage('creature/giant_human', 'creature/giant_human');
         this.map.addTilesetImage('creature/mutant', 'creature/mutant');
         this.map.addTilesetImage('creature/huge_animal', 'creature/huge_animal');
@@ -86,43 +93,51 @@ var cave = {
         }
         //hide the collision layer
         this.layers.collision.alpha = 0;
+        this.layers.protection.alpha = 0
         //set up collision
         game.physics.arcade.enable(this.layers.collision);
-        //this.map.setCollision(1, true, this.layers.collision);
-        //needs correct index
-        //this.map.setTileIndexCallback(index,this.hitWall,this);
-
+        this.map.setCollision(1, true, this.layers.collision);
         this.layers.ground_layer.resizeWorld();
+        console.log(this.map)
 
         this.portal = game.add.sprite(17 * 32, 17 * 32, 'portal')
         this.portal.animations.add('swirl')
         this.portal.animations.play('swirl')
         // create player object
-        this.player = new Player(game)
-        this.player.create(this.init_health, this.init_coins)
-        //this.game.camera.follow(this.player)
+        if (game.global.debugging) {
+            this.player = new Player(game)
+		    this.player.create(100)
+        }
+        else {
+            this.player.create(this.init_health, this.init_coins)
+            this.player.player.body.velocity.x = 0
+            this.player.player.body.velocity.y = 0
+        }
         this.player.player.x = 15 * 32
         this.player.player.y = 15 * 32
+        
         game.addPauseButton(game);
         this.player.player.anchor.setTo(0.5)
         game.camera.follow(this.player.player)
-
+        if (game.global.debugging) {
+            //console.log(this.player.player)
+        }
         this.enemy1 = new Enemy(game)
         this.enemy1.create()
         this.enemy2 = new Enemy(game)
         this.enemy2.create()
-        console.log(this.player.player)
+        
         game.addPauseButton(game)
         this.hud = new HUD(game, 'Player', 110, 410)
         this.hud.addItem(this.player.player, 'health', true)
         
         this.coins = game.add.group()
-		for (var i = 0; i < 3; i++) {
-			item = new PickUp(game)
-			item.create('coin', 75 + (48 * i), 75)
-			this.coins.add(item.item)
-			//console.log(this.coins)
-		}
+		// for (var i = 0; i < 3; i++) {
+		// 	item = new PickUp(game)
+		// 	item.create('coin', 75 + (48 * i), 75)
+		// 	this.coins.add(item.item)
+		// 	//console.log(this.coins)
+		// }
         this.hud.addItem(this.player.player, 'coins', true)
         
         this.hud.create()
@@ -130,34 +145,37 @@ var cave = {
 
     update: function () {
         this.player.update()
-        if (this.up == 0) {
-            console.log('up')
-
-        }
         
-		
-		// if (this.enemy1.isSpawned) {
-		// 	this.enemy1.update(this.player.player)
-		// }
-		// else {
-        //     // parameters are an instance of the state, what tile index the enemy will spawn on, 
-        //     // what layer the index belongs to, the enemy type, what direction the enemy faces 
-        //     // if it only faces one direction, and the health of the enemy
-		// 	this.enemy1.spawnEnemy(this, 761, 1, 'skeleton', 'left', 100)
-		// }
-		// if (this.enemy2.isSpawned) {
-		// 	this.enemy2.update(this.player.player)
-		// }
-		// else {
-		// 	this.enemy2.spawnEnemy(this, 761, 1, 'zombie', 'right', 100)
-		// }
-		console.log(this.player.player.animations.currentFrame)
-		// debugging
-		if (this.player.player.animations.currentFrame.name.includes('Idle')) {
-			// console.log(this.player.player)
-			console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y, 32, 32, this.layers.collision))
-			
-		}
+        if (game.global.debugging) {
+            // if (this.up == 0) {
+            //     console.log('up')
+    
+            // }
+            true//console.log(this.player.player.animations.currentFrame)
+            // debugging
+            // if (this.player.player.animations.currentFrame.name.includes('Idle')) {
+            //     // console.log(this.player.player)
+            //     console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y, 32, 32, this.layers.collision))
+                
+            // }
+        }
+        else {
+            if (this.enemy1.isSpawned) {
+                this.enemy1.update(this.player.player)
+            }
+            else {
+                // parameters are an instance of the state, what tile index the enemy will spawn on, 
+                // what layer the index belongs to, the enemy type, what direction the enemy faces 
+                // if it only faces one direction, and the health of the enemy
+                this.enemy1.spawnEnemy(this, 761, 1, 'skeleton', 'left', 100)
+            }
+            if (this.enemy2.isSpawned) {
+                this.enemy2.update(this.player.player)
+            }
+            else {
+                this.enemy2.spawnEnemy(this, 761, 1, 'zombie', 'right', 100)
+            }
+        }
 		this.hud.updateHUD()
 
 		// collision with walls
@@ -170,19 +188,20 @@ var cave = {
         // game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
         
         this.checkCoins()
-        this.checkFinish()
+        //this.checkFinish()
         this.checkGameOver()
-        this.up++
-        if (this.up == 1) {
-            console.log('up2')
+        if (game.global.debugging) {
+            // this.up++
+            // if (this.up == 1) {
+            //     console.log('up2')
 
+            // }
         }
     },
     
     hurtPlayer: function() {
 		this.player.player.data['health'] -= 2
-		//console.log
-		this.killPlayer
+		this.killPlayer()
 	},
 
 	killPlayer: function() {
@@ -198,14 +217,18 @@ var cave = {
         if (this.player.gameOver) {
             game.global.current_level = 'gameOver'
 			game.state.start(game.global.current_level, true, true)
-		}
-        console.log(this.player.gameOver)
+        }
+        if (game.global.debugging) {
+            console.log(this.player.gameOver)
+        }
 	},
     
 	checkCoins: function () {
         for (var i = 0; i < this.coins.length; i++) {
-            //console.log('x: ' + this.coins.children[i].x + '          y: ' + this.coins.children[i].y)
-            //console.log(Phaser.Rectangle.intersects(this.player.player.getBounds(), this.coins.children[i].getBounds()))
+            if (game.global.debugging) {
+                //console.log('x: ' + this.coins.children[i].x + '          y: ' + this.coins.children[i].y)
+                //console.log(Phaser.Rectangle.intersects(this.player.player.getBounds(), this.coins.children[i].getBounds()))
+            }
 			if (Phaser.Rectangle.intersects(this.player.player.getBounds(), this.coins.children[i].getBounds())) {
 				this.pickUpItem(this.coins.children[i])
 			}
@@ -214,7 +237,10 @@ var cave = {
     },
     
     pickUpItem: function (item) {
-		console.log(item)
+		if (game.global.debugging) {
+            //console.log(item)
+            
+        }
 		if (item.key == 'coin') {
 			item.destroy()
 			this.player.player.data['coins']++

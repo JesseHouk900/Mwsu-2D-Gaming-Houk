@@ -1,7 +1,7 @@
 // 435 on layer 1_terrain = temple door
 // 761 on layer 1_terrain = tiled path
 // collision is 322
-var forest = {
+var forest_1 = {
     init_health: 0,
     init_coins: 0,
     init: function (player, health, coins) {
@@ -182,7 +182,7 @@ var forest = {
         goal = this.map.getTileWorldXY(Math.round(this.player.player.x), Math.round(this.player.player.y) - 64, 32, 32, this.layers.terrain_layer)
         //console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y - 32, 32, 32, this.layers.terrain_layer))
         if (goal != null && goal.index == 435) {
-            game.global.current_level = 'cave'
+            game.global.current_level = 'forest'
             game.global.level++
 			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'])
 		}

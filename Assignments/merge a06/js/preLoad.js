@@ -18,6 +18,7 @@ var preLoad = {
 		game.load.image('pause', 'assets/images/pause.png');			
 		game.load.image('splash', 'assets/images/splash_screen_800.jpg');
 		game.load.image('gameOver', 'assets/images/game_over_800.png');
+		game.load.image('sign', 'assets/images/sign.png')
 
 		// load atlas here: 
 		//////////////////////////////////////////////////////

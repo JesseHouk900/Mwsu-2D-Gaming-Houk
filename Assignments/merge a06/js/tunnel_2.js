@@ -1,7 +1,20 @@
 // 27 on layer 1_terrain = small rock
 // 4 on layer 0_ground = dirt floor
 // collision is 1
-var tunnel = {
+var tunnel_2 = {
+    init_health: 0,
+    init_coins: 0,
+    init: function (player, health, coins) {
+        this.player = player
+        this.player.player.animations.play('Idle_' + this.player.prevDir)
+        this.init_health = health
+        this.init_coins = coins
+        if (game.global.debugging) {
+            //console.log(coins)
+            //console.log(this.player)
+        
+        }
+    },
 
 	preload: function () {
 		console.log("tunnel.js")
@@ -69,8 +82,9 @@ var tunnel = {
 		console.log(this.map)
 		
 		// create player object
-		this.player = new Player(game)
-		this.player.create(100)
+        this.player.create(this.init_health, this.init_coins)
+        this.player.player.body.velocity.x = 0
+        this.player.player.body.velocity.y = 0
 		if (game.global.debugging) {
             this.player.player.x = 4 * 32
             this.player.player.y = 49 * 32
@@ -159,7 +173,7 @@ var tunnel = {
 
 	checkFinish: function () {
 		if (Math.round(this.player.player.x / 32) < 3 && Math.round(this.player.player.y / 32) < 51 && Math.round(this.player.player.y / 32) > 48) {
-			game.global.current_level = 'tunnel_1'
+			game.global.current_level = 'forest'
 			game.global.level++
 			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'])
 		}

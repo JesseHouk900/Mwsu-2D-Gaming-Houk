@@ -4,7 +4,7 @@ function PickUp (gameCopy) {
     this.item_scale
     this.create = function (type, x, y) {
         if (type == 'coin') {
-            console.log(game)
+            //console.log(game)
             this.item = game.add.sprite(x, y, 'coin')
             this.item.animations.add('do_nothing', [0])
             this.item_scale = .5

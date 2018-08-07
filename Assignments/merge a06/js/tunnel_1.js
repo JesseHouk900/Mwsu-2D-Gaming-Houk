@@ -1,12 +1,24 @@
 // 27 on layer 1_terrain = small rock
 // 4 on layer 0_ground = dirt floor
 // collision is 1
-var tunnel = {
-
+var tunnel_1 = {
+    init_health: 0,
+    init_coins: 0,
+    init: function (player, health, coins) {
+        this.player = player
+        this.player.player.animations.play('Idle_' + this.player.prevDir)
+        this.init_health = health
+        this.init_coins = coins
+        if (game.global.debugging) {
+            //console.log(coins)
+            //console.log(this.player)
+        
+        }
+    },
 	preload: function () {
-		console.log("tunnel.js")
+		console.log("tunnel_1.js")
 		// Load tile map
-		game.load.tilemap('tunnel', 'assets/maps/tunnel.json', null, Phaser.Tilemap.TILED_JSON)
+		game.load.tilemap('tunnel_1', 'assets/maps/tunnel_1.json', null, Phaser.Tilemap.TILED_JSON)
 		
 		// map tile images
 		game.load.image('ground', 'assets/tileset/ground/brown.png')
@@ -32,7 +44,7 @@ var tunnel = {
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 
 		// Mpping layers and tilesets
-		this.map = game.add.tilemap('tunnel')
+		this.map = game.add.tilemap('tunnel_1')
 		//this.map = game.addPauseButton.tilemap(game)
 		this.map.addTilesetImage('ground', 'ground')
 		this.map.addTilesetImage('logic/collision', 'collision')
@@ -69,15 +81,17 @@ var tunnel = {
 		console.log(this.map)
 		
 		// create player object
-		this.player = new Player(game)
-		this.player.create(100)
+        this.player.create(this.init_health, this.init_coins)
+        
+        this.player.player.body.velocity.x = 0
+        this.player.player.body.velocity.y = 0
 		if (game.global.debugging) {
-            this.player.player.x = 4 * 32
-            this.player.player.y = 49 * 32
+            this.player.player.x = 99 * 32
+            this.player.player.y = 124 * 32
 		}
 		else {
-			this.player.player.x = 53 * 32
-			this.player.player.y = 33 * 32
+			this.player.player.x = 124 * 32
+			this.player.player.y = 44 * 32
 		}
 		//game.addPauseButton(game);
 		this.player.player.anchor.setTo(0.5)
@@ -110,7 +124,7 @@ var tunnel = {
 	
 	update: function () {
 		//console.log('update')
-		this.player.update()
+        this.player.update()
 		
 		if (this.enemy1.isSpawned) {
 			this.enemy1.update(this.player.player)
@@ -125,7 +139,8 @@ var tunnel = {
 			this.enemy2.spawnEnemy(this, 27, 1, 'zombie', 'right', 100)
 		}
 		//console.log(this.player.player.animations.currentFrame)
-		// debugging
+        // debugging
+        console.log(this.player.player)
 		//console.log('update')
 		if (this.player.player.animations.currentFrame.name.includes('Idle')) {
 			//console.log(this.map)
@@ -158,8 +173,8 @@ var tunnel = {
 	},
 
 	checkFinish: function () {
-		if (Math.round(this.player.player.x / 32) < 3 && Math.round(this.player.player.y / 32) < 51 && Math.round(this.player.player.y / 32) > 48) {
-			game.global.current_level = 'tunnel_1'
+		if (Math.round(this.player.player.x / 32) < 98 * 32 && Math.round(this.player.player.x / 32) < 104 * 32 && Math.round(this.player.player.y / 32) > 128 * 32) {
+			game.global.current_level = 'tunnel_2'
 			game.global.level++
 			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'])
 		}

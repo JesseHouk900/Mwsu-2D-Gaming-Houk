@@ -16,7 +16,7 @@ function Player(gameCopy) {
     // }
     this.create = function (health, coins = 0) {
         this.player_speed = 200
-        this.player_run_multiplier = 1.5
+        this.player_run_multiplier = 2
         // Adding the knight atlas that contains all the animations
 		this.player = game.add.sprite(game.camera.width / 2, game.camera.height / 2, 'knight_atlas');
         this.keysSetup()

@@ -21,17 +21,24 @@ game.global = {
     best_score: 0,
     level: 1,
     backgroundColor: "#000000",
-    current_level: "tunnel"
+    current_level: "",
+    debugging: true
+}
+if (game.global.debugging) {
+    game.global.current_level = "tunnel"
+}
+else {
+    game.global.current_level = "tunnel"
 }
 
 game.state.add("boot", boot);
 game.state.add("preLoad", preLoad);
 game.state.add("mainMenu", mainMenu);
 game.state.add("tunnel", tunnel);
-game.state.add("cave", cave);
-game.state.add("cave2", cave2);
+game.state.add("tunnel_1", tunnel_1);
+game.state.add("tunnel_2", tunnel_2);
 game.state.add("forest", forest);
-game.state.add("islands", islands);
+game.state.add("forest_1", forest_1);
 game.state.add("gameOver", gameOver);
 game.state.add("finish", finish)
 game.state.start("boot");
