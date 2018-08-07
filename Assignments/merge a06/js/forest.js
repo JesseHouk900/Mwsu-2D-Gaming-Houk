@@ -4,11 +4,17 @@
 var forest = {
     init_health: 0,
     init_coins: 0,
-    init: function (player, health, coins) {
+    init_x: 64 * 32,
+    init_y: 102 * 32,
+    init: function (player, health, coins, last_level) {
         this.player = player
         this.player.player.animations.play('Idle_' + this.player.prevDir)
         this.init_health = health
         this.init_coins = coins
+        if (last_level == '3') {
+            this.init_x = 71 * 32
+            this.init_y = 126 * 32
+        }
         if (game.global.debugging) {
             //console.log(coins)
             //console.log(this.player)
@@ -48,6 +54,10 @@ var forest = {
         game.physics.startSystem(Phaser.Physics.ARCADE);
         //mapping tilesets
         this.map = game.add.tilemap('forest_e')
+
+        // console.log('this')
+        // console.log(this.map.tiles[tile.index][2])
+        // console.log('that')
         this.map.addTilesetImage('ground','ground');
         this.map.addTilesetImage('pool','pool');
         this.map.addTilesetImage('earth_dark','earth_dark');
@@ -97,7 +107,7 @@ var forest = {
         }
         else {
             this.player.player.x = 126 * 32
-            this.player.player.y = 95 * 32
+            this.player.player.y = this.init_y * 32
         }
         this.layers.ground_layer.resizeWorld();
         game.camera.follow(this.player.player)
@@ -113,8 +123,12 @@ var forest = {
         this.hud.addItem(this.player.player, 'health', true)
 
         this.coins = game.add.group()
-        this.addCoinsAlongX(4, 'coin', 99, 96)
-        this.addCoinsAlongX(10, 'shiningCoin', 81, 72)
+        this.shiningCoins = game.add.group()
+		this.spawnCoins('coin', 15, 82, 128, 5, 128)
+		this.spawnCoins('shiningCoin', 5, 44, 128, 15, 94)
+		
+        // this.addCoinsAlongX(4, 'coin', 99, 96)
+        // this.addCoinsAlongX(10, 'shiningCoin', 81, 72)
         
         this.hud.addItem(this.player.player, 'coins', true)
         
@@ -122,6 +136,10 @@ var forest = {
         
         this.sign = game.add.image(64 * 32, 68 * 32, 'sign')
         this.sign.scale.setTo(32/113, 32/105)
+
+        this.portal = game.add.sprite(63 * 32, 101 * 32, 'portal')
+        this.portal.animations.add('swirl')
+		this.portal.animations.play('swirl', 6, true)
         
     },
 
@@ -182,9 +200,9 @@ var forest = {
         goal = this.map.getTileWorldXY(Math.round(this.player.player.x), Math.round(this.player.player.y) - 64, 32, 32, this.layers.terrain_layer)
         //console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y - 32, 32, 32, this.layers.terrain_layer))
         if (goal != null && goal.index == 435) {
-            game.global.current_level = 'cave'
+            game.global.current_level = 'finish'
             game.global.level++
-			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'])
+			game.state.start(game.global.current_level/*, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins']*/)
 		}
 	},
 
@@ -196,11 +214,55 @@ var forest = {
 		}
 	},
     
+    spawnCoins: function (name, num, xmin, xmax, ymin, ymax) {
+		if (name == 'coin') {
+			group = this.coins
+
+		}
+		if (name == 'shiningCoin') {
+			group = this.shiningCoins
+
+		}
+		for(; group.length != num;) {
+			x = game.rnd.integerInRange(xmin, xmax)
+            y = game.rnd.integerInRange(ymin, ymax)
+            x *= 32
+            y *= 32
+			if (this.map.getTileWorldXY(x, y, 32, 32, this.layers.collision) == null) {
+				console.log(this.map.getTileWorldXY(x, y, 32, 32, this.layers.collision))
+				item = new PickUp(game)
+				item.create(name, x, y)
+				group.add(item.item)
+				// if (name === 'coin') {
+				// 	this.coins.add(item.item)
+				// }
+				// if (name === 'shiningCoin') {
+				// 	this.shiningCoins.add(item.item)
+				// }
+			}
+		}
+		if (name == 'coin') {
+			this.coins = group
+
+		}
+		if (name == 'shiningCoin') {
+			this.shiningCoins = group
+
+		}
+    },
+    
 	checkCoins: function () {
 		for (var i = 0; i < this.coins.length; i++) {
 			//console.log('x: ' + this.coins.children[i].x + '          y: ' + this.coins.children[i].y)
 			if (Phaser.Rectangle.intersects(this.player.player.getBounds(), this.coins.children[i].getBounds())) {
 				this.pickUpItem(this.coins.children[i])
+			}
+
+		}
+		for (var i = 0; i < this.shiningCoins.length; i++) {
+			//console.log(this.shiningCoins.children[i])
+			if (Phaser.Rectangle.intersects(this.player.player.getBounds(), this.shiningCoins.children[i].getBounds())) {
+				this.pickUpItem(this.shiningCoins.children[i])
 			}
 
 		}

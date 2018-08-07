@@ -5,6 +5,7 @@ var forest_1 = {
     init_health: 0,
     init_coins: 0,
     init: function (player, health, coins) {
+        console.log(player)
         this.player = player
         this.player.player.animations.play('Idle_' + this.player.prevDir)
         this.init_health = health
@@ -12,14 +13,14 @@ var forest_1 = {
         if (game.global.debugging) {
             //console.log(coins)
             //console.log(this.player)
-        
+        //game.global.debugging = false
         }
     },
 
     preload:function(){
         console.log('forest.js')
         //loading tilemap
-        game.load.tilemap('forest_e', 'assets/maps/forest_e.json', null, Phaser.Tilemap.TILED_JSON);
+        game.load.tilemap('forest_f', 'assets/maps/forest_f.json', null, Phaser.Tilemap.TILED_JSON);
         //mapping tile .pngs
         game.load.image('ground','assets/tileset/ground/ground.png');
         game.load.image('pool','assets/tileset/ground/water/pool.png');
@@ -47,7 +48,8 @@ var forest_1 = {
     create: function(){
         game.physics.startSystem(Phaser.Physics.ARCADE);
         //mapping tilesets
-        this.map = game.add.tilemap('forest_e')
+        this.map = game.add.tilemap('forest_f')
+        console.log(this.map.tiles[tile.index][2])
         this.map.addTilesetImage('ground','ground');
         this.map.addTilesetImage('pool','pool');
         this.map.addTilesetImage('earth_dark','earth_dark');
@@ -92,12 +94,12 @@ var forest_1 = {
         this.player.player.body.velocity.y = 0
         if (game.global.debugging) {
             // console.log(this.init_coins)
-            this.player.player.x = 65 * 32
-            this.player.player.y = 72 * 32
+            this.player.player.x = 3 * 32
+            this.player.player.y = 20 * 32
         }
         else {
-            this.player.player.x = 126 * 32
-            this.player.player.y = 95 * 32
+            this.player.player.x = 64 * 32
+            this.player.player.y = 104 * 32
         }
         this.layers.ground_layer.resizeWorld();
         game.camera.follow(this.player.player)
@@ -113,59 +115,63 @@ var forest_1 = {
         this.hud.addItem(this.player.player, 'health', true)
 
         this.coins = game.add.group()
-        this.addCoinsAlongX(4, 'coin', 99, 96)
-        this.addCoinsAlongX(10, 'shiningCoin', 81, 72)
+        this.shiningCoins = game.add.group()
+		this.spawnCoins('coin', 15, 0, 94, 10, 94)
+		this.spawnCoins('shiningCoin', 5, 0, 94, 10, 94)
+		
+        // this.addCoinsAlongX(4, 'coin', 99, 96)
+        // this.addCoinsAlongX(10, 'shiningCoin', 81, 72)
         
         this.hud.addItem(this.player.player, 'coins', true)
         
         this.hud.create()
         
-        this.sign = game.add.image(64 * 32, 68 * 32, 'sign')
-        this.sign.scale.setTo(32/113, 32/105)
+        this.sign = game.add.image(82 * 32, 91 * 32, 'sign')
+        this.sign.scale.setTo(-32/113, 32/105)
         
     },
 
     update:function(){
-        this.player.update()
+        //this.player.update()
 		
-		if (this.enemy1.isSpawned) {
-			this.enemy1.update(this.player.player)
-		}
-		else {
-            // parameters are an instance of the state, what tile index the enemy will spawn on, 
-            // what layer the index belongs to, the enemy type, what direction the enemy faces 
-            // if it only faces one direction, and the health of the enemy
-			this.enemy1.spawnEnemy(this, 761, 1, 'skeleton', 'left', 100)
-		}
-		if (this.enemy2.isSpawned) {
-			this.enemy2.update(this.player.player)
-		}
-		else {
-			this.enemy2.spawnEnemy(this, 761, 1, 'zombie', 'right', 100)
-		}
+		// if (this.enemy1.isSpawned) {
+		// 	this.enemy1.update(this.player.player)
+		// }
+		// else {
+        //     // parameters are an instance of the state, what tile index the enemy will spawn on, 
+        //     // what layer the index belongs to, the enemy type, what direction the enemy faces 
+        //     // if it only faces one direction, and the health of the enemy
+		// 	this.enemy1.spawnEnemy(this, 761, 1, 'skeleton', 'left', 100)
+		// }
+		// if (this.enemy2.isSpawned) {
+		// 	this.enemy2.update(this.player.player)
+		// }
+		// else {
+		// 	this.enemy2.spawnEnemy(this, 761, 1, 'zombie', 'right', 100)
+		// }
         // collision with walls
-        game.physics.arcade.collide(this.player.player, this.layers.collision)
-        game.physics.arcade.collide(this.enemy1.enemy, this.layers.collision)
-        game.physics.arcade.collide(this.enemy2.enemy, this.layers.collision)
-		if (game.global.debugging) {
-            //console.log(this.player.player.animations.currentFrame)
-            if (this.player.player.animations.currentFrame.name.includes('Idle')) {
-                // console.log(this.player.player)
-                // console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y, 32, 32, this.layers.terrain_layer))
+        // game.physics.arcade.collide(this.player.player, this.layers.collision)
+        // game.physics.arcade.collide(this.enemy1.enemy, this.layers.collision)
+        // game.physics.arcade.collide(this.enemy2.enemy, this.layers.collision)
+		// if (game.global.debugging) {
+        //     //console.log(this.player.player.animations.currentFrame)
+        //     if (this.player.player.animations.currentFrame.name.includes('Idle')) {
+        //         // console.log(this.player.player)
+        //         // console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y, 32, 32, this.layers.terrain_layer))
                 
-            }
-        }
-        else {
-            // check enemy attack
-            game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
-            game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
-        }
-		this.hud.updateHUD()
+        //     }
+        // }
+        // else {
+        //     // check enemy attack
+        //     game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
+        //     game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
+        // }
+		//this.hud.updateHUD()
 
         
-        this.checkCoins()
-        this.checkFinish()
-        this.checkGameOver()
+        // this.checkCoins()
+        // this.checkFinish()
+        // this.checkGameOver()
     },
 
     hurtPlayer: function() {
@@ -179,12 +185,10 @@ var forest_1 = {
 	},
 
 	checkFinish: function () {
-        goal = this.map.getTileWorldXY(Math.round(this.player.player.x), Math.round(this.player.player.y) - 64, 32, 32, this.layers.terrain_layer)
-        //console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y - 32, 32, 32, this.layers.terrain_layer))
-        if (goal != null && goal.index == 435) {
+        if (Math.round(this.player.player.x / 32) < 2) {
             game.global.current_level = 'forest'
             game.global.level++
-			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'])
+			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'], this.player.player.y)
 		}
 	},
 
@@ -194,7 +198,44 @@ var forest_1 = {
 			game.global.current_level = 'gameOver'
 			game.state.start(game.global.current_level, true, true)
 		}
-	},
+    },
+    
+    spawnCoins: function (name, num, xmin, xmax, ymin, ymax) {
+		if (name == 'coin') {
+			group = this.coins
+
+		}
+		if (name == 'shiningCoin') {
+			group = this.shiningCoins
+
+		}
+		for(; group.length != num;) {
+			x = game.rnd.integerInRange(xmin, xmax)
+            y = game.rnd.integerInRange(ymin, ymax)
+            x *= 32
+            y *= 32
+			if (this.map.getTileWorldXY(x, y, 32, 32, this.layers.collision) == null) {
+				console.log(this.map.getTileWorldXY(x, y, 32, 32, this.layers.collision))
+				item = new PickUp(game)
+				item.create(name, x, y)
+				group.add(item.item)
+				// if (name === 'coin') {
+				// 	this.coins.add(item.item)
+				// }
+				// if (name === 'shiningCoin') {
+				// 	this.shiningCoins.add(item.item)
+				// }
+			}
+		}
+		if (name == 'coin') {
+			this.coins = group
+
+		}
+		if (name == 'shiningCoin') {
+			this.shiningCoins = group
+
+		}
+    },
     
 	checkCoins: function () {
 		for (var i = 0; i < this.coins.length; i++) {
@@ -204,10 +245,17 @@ var forest_1 = {
 			}
 
 		}
+		for (var i = 0; i < this.shiningCoins.length; i++) {
+			//console.log(this.shiningCoins.children[i])
+			if (Phaser.Rectangle.intersects(this.player.player.getBounds(), this.shiningCoins.children[i].getBounds())) {
+				this.pickUpItem(this.shiningCoins.children[i])
+			}
+
+		}
     },
     
     pickUpItem: function (item) {
-		console.log(item)
+		//console.log(item)
 		if (item.key == 'coin') {
 			item.destroy()
 			this.player.player.data['coins']++

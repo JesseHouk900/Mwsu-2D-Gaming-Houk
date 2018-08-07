@@ -110,13 +110,17 @@ var tunnel_1 = {
 		this.hud = new HUD(game, 'Player', 110, 410)
 		this.hud.addItem(this.player.player, 'health', true)
 
-		this.coins = game.add.group()
-		this.addCoinsAlongX(5, 'coin', 34, 32)
+        this.coins = game.add.group()
+        this.shiningCoins = game.add.group()
+		this.spawnCoins('coin', 15, 82, 128, 5, 128)
+		this.spawnCoins('shiningCoin', 5, 82, 128, 5, 128)
 		
-		this.addCoinsAlongX(10, 'coin', 7, 50)
-		this.addCoinsAlongX(3, 'shiningCoin', 27, 78)
-		this.addCoinsAlongX(3, 'shiningCoin', 27, 81)
-		this.addCoinsAlongX(3, 'shiningCoin', 27, 84)
+		// this.addCoinsAlongX(5, 'coin', 34, 32)
+		
+		// this.addCoinsAlongX(10, 'coin', 7, 50)
+		// this.addCoinsAlongX(3, 'shiningCoin', 27, 78)
+		// this.addCoinsAlongX(3, 'shiningCoin', 27, 81)
+		// this.addCoinsAlongX(3, 'shiningCoin', 27, 84)
 		this.hud.addItem(this.player.player, 'coins', true)
 
 		this.hud.create()
@@ -173,7 +177,7 @@ var tunnel_1 = {
 	},
 
 	checkFinish: function () {
-		if (Math.round(this.player.player.x / 32) < 98 * 32 && Math.round(this.player.player.x / 32) < 104 * 32 && Math.round(this.player.player.y / 32) > 128 * 32) {
+		if (Math.round(this.player.player.x / 32) > 98 && Math.round(this.player.player.x / 32) < 104 && Math.round(this.player.player.y / 32) > 125) {
 			game.global.current_level = 'tunnel_2'
 			game.global.level++
 			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'])
@@ -188,11 +192,55 @@ var tunnel_1 = {
 		}
 	},
 
+    spawnCoins: function (name, num, xmin, xmax, ymin, ymax) {
+		if (name == 'coin') {
+			group = this.coins
+
+		}
+		if (name == 'shiningCoin') {
+			group = this.shiningCoins
+
+		}
+		for(; group.length != num;) {
+			x = game.rnd.integerInRange(xmin, xmax)
+            y = game.rnd.integerInRange(ymin, ymax)
+            x *= 32
+            y *= 32
+			if (this.map.getTileWorldXY(x, y, 32, 32, this.layers.collision) == null) {
+				console.log('x: ' + x + '    y: ' + y)
+				item = new PickUp(game)
+				item.create(name, x, y)
+				group.add(item.item)
+				// if (name === 'coin') {
+				// 	this.coins.add(item.item)
+				// }
+				// if (name === 'shiningCoin') {
+				// 	this.shiningCoins.add(item.item)
+				// }
+			}
+		}
+		if (name == 'coin') {
+			this.coins = group
+
+		}
+		if (name == 'shiningCoin') {
+			this.shiningCoins = group
+
+		}
+    },
+    
 	checkCoins: function () {
 		for (var i = 0; i < this.coins.length; i++) {
 			//console.log(this.coins.children[i])
 			if (Phaser.Rectangle.intersects(this.player.player.getBounds(), this.coins.children[i].getBounds())) {
 				this.pickUpItem(this.coins.children[i])
+			}
+
+		}
+		for (var i = 0; i < this.shiningCoins.length; i++) {
+			//console.log(this.shiningCoins.children[i])
+			if (Phaser.Rectangle.intersects(this.player.player.getBounds(), this.shiningCoins.children[i].getBounds())) {
+				this.pickUpItem(this.shiningCoins.children[i])
 			}
 
 		}

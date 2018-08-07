@@ -97,12 +97,15 @@ var tunnel = {
 		this.hud.addItem(this.player.player, 'health', true)
 
 		this.coins = game.add.group()
-		this.addCoinsAlongX(5, 'coin', 34, 32)
+		this.shiningCoins = game.add.group()
+		this.spawnCoins('coin', 15, 0, 68, 19, 93)
+		this.spawnCoins('shiningCoin', 5, 0, 68, 19, 93)
+		// this.addCoinsAlongX(5, 'coin', 34, 32)
 		
-		this.addCoinsAlongX(10, 'coin', 7, 50)
-		this.addCoinsAlongX(3, 'shiningCoin', 27, 78)
-		this.addCoinsAlongX(3, 'shiningCoin', 27, 81)
-		this.addCoinsAlongX(3, 'shiningCoin', 27, 84)
+		// this.addCoinsAlongX(10, 'coin', 7, 50)
+		// this.addCoinsAlongX(3, 'shiningCoin', 27, 78)
+		// this.addCoinsAlongX(3, 'shiningCoin', 27, 81)
+		// this.addCoinsAlongX(3, 'shiningCoin', 27, 84)
 		this.hud.addItem(this.player.player, 'coins', true)
 
 		this.hud.create()
@@ -129,7 +132,7 @@ var tunnel = {
 		//console.log('update')
 		if (this.player.player.animations.currentFrame.name.includes('Idle')) {
 			//console.log(this.map)
-			//console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y/*, 32, 32, this.layers.terrain*/))
+			console.log(this.map.getTileWorldXY(this.player.player.x, this.player.player.y, 32, 32, this.layers.collision))
 			
 		}
 		this.hud.updateHUD()
@@ -181,7 +184,52 @@ var tunnel = {
 			}
 
 		}
+		for (var i = 0; i < this.shiningCoins.length; i++) {
+			//console.log(this.shiningCoins.children[i])
+			if (Phaser.Rectangle.intersects(this.player.player.getBounds(), this.shiningCoins.children[i].getBounds())) {
+				this.pickUpItem(this.shiningCoins.children[i])
+			}
+
+		}
 	},
+
+    spawnCoins: function (name, num, xmin, xmax, ymin, ymax) {
+		if (name == 'coin') {
+			group = this.coins
+
+		}
+		if (name == 'shiningCoin') {
+			group = this.shiningCoins
+
+		}
+		for(; group.length != num;) {
+			x = game.rnd.integerInRange(xmin, xmax)
+            y = game.rnd.integerInRange(ymin, ymax)
+            x *= 32
+            y *= 32
+			if (this.map.getTileWorldXY(x, y, 32, 32, this.layers.collision) == null) {
+				console.log('x: ' + x + '    y: ' + y)
+				item = new PickUp(game)
+				item.create(name, x, y)
+				group.add(item.item)
+				// if (name === 'coin') {
+				// 	this.coins.add(item.item)
+				// }
+				// if (name === 'shiningCoin') {
+				// 	this.shiningCoins.add(item.item)
+				// }
+			}
+		}
+		if (name == 'coin') {
+			this.coins = group
+
+		}
+		if (name == 'shiningCoin') {
+			this.shiningCoins = group
+
+		}
+    },
+    
 
 	pickUpItem: function (item) {
 		//console.log(item)

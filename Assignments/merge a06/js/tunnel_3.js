@@ -1,11 +1,9 @@
 // 27 on layer 1_terrain = small rock
 // 4 on layer 0_ground = dirt floor
 // collision is 1
-var tunnel_2 = {
+var tunnel_3 = {
     init_health: 0,
     init_coins: 0,
-    portaling: false,
-    
     init: function (player, health, coins) {
         this.player = player
         this.player.player.animations.play('Idle_' + this.player.prevDir)
@@ -13,16 +11,14 @@ var tunnel_2 = {
         this.init_coins = coins
         if (game.global.debugging) {
             //console.log(coins)
-			//console.log(this.player)
-			game.global.debugging = false
+            //console.log(this.player)
         
         }
     },
-
 	preload: function () {
-		console.log("tunnel.js")
+		console.log("tunnel_3.js")
 		// Load tile map
-		game.load.tilemap('tunnel_2', 'assets/maps/tunnel_2.json', null, Phaser.Tilemap.TILED_JSON)
+		game.load.tilemap('tunnel_3', 'assets/maps/tunnel_3.json', null, Phaser.Tilemap.TILED_JSON)
 		
 		// map tile images
 		game.load.image('ground', 'assets/tileset/ground/brown.png')
@@ -48,7 +44,7 @@ var tunnel_2 = {
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 
 		// Mpping layers and tilesets
-		this.map = game.add.tilemap('tunnel_2')
+		this.map = game.add.tilemap('tunnel_3')
 		//this.map = game.addPauseButton.tilemap(game)
 		this.map.addTilesetImage('ground', 'ground')
 		this.map.addTilesetImage('logic/collision', 'collision')
@@ -86,15 +82,16 @@ var tunnel_2 = {
 		
 		// create player object
         this.player.create(this.init_health, this.init_coins)
+        
         this.player.player.body.velocity.x = 0
         this.player.player.body.velocity.y = 0
 		if (game.global.debugging) {
-            this.player.player.x = 62 * 32
-            this.player.player.y = 27 * 32
+            this.player.player.x = 105 * 32
+            this.player.player.y = 3 * 32
 		}
 		else {
-			this.player.player.x = 92 * 32
-			this.player.player.y = 1 * 32
+			this.player.player.x = 127 * 32
+			this.player.player.y = 59 * 32
 		}
 		//game.addPauseButton(game);
 		this.player.player.anchor.setTo(0.5)
@@ -113,12 +110,12 @@ var tunnel_2 = {
 		this.hud = new HUD(game, 'Player', 110, 410)
 		this.hud.addItem(this.player.player, 'health', true)
 
-		this.coins = game.add.group()
+        this.coins = game.add.group()
         this.shiningCoins = game.add.group()
-		this.spawnCoins('coin', 15, 0, 120, 0, 54)
-		this.spawnCoins('shiningCoin', 5, 0, 120, 0, 54)
+		this.spawnCoins('coin', 15, 82, 128, 5, 128)
+		this.spawnCoins('shiningCoin', 5, 82, 128, 5, 128)
 		
-        // this.addCoinsAlongX(5, 'coin', 34, 32)
+		// this.addCoinsAlongX(5, 'coin', 34, 32)
 		
 		// this.addCoinsAlongX(10, 'coin', 7, 50)
 		// this.addCoinsAlongX(3, 'shiningCoin', 27, 78)
@@ -126,20 +123,12 @@ var tunnel_2 = {
 		// this.addCoinsAlongX(3, 'shiningCoin', 27, 84)
 		this.hud.addItem(this.player.player, 'coins', true)
 
-        this.hud.create()
-        
-        this.portal = game.add.sprite(54 * 32, 30 * 32, 'portal')
-        this.portal.animations.add('swirl')
-		this.portal.animations.play('swirl', 6, true)
-		game.physics.arcade.enable(this.portal)
+		this.hud.create()
 	},
 	
 	update: function () {
 		//console.log('update')
-		this.player.update()
-		console.log(this.player.player.x)
-
-		console.log(this.player.player.y)
+        this.player.update()
 		
 		if (this.enemy1.isSpawned) {
 			this.enemy1.update(this.player.player)
@@ -154,7 +143,8 @@ var tunnel_2 = {
 			this.enemy2.spawnEnemy(this, 27, 1, 'zombie', 'right', 100)
 		}
 		//console.log(this.player.player.animations.currentFrame)
-		// debugging
+        // debugging
+        console.log(this.player.player)
 		//console.log('update')
 		if (this.player.player.animations.currentFrame.name.includes('Idle')) {
 			//console.log(this.map)
@@ -168,9 +158,7 @@ var tunnel_2 = {
 		game.physics.arcade.collide(this.enemy2.enemy, this.layers.collision)
 		// check enemy attack
 		game.physics.arcade.overlap(this.player.player, this.enemy1.enemy, this.hurtPlayer, null, this)
-        game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
-        // check enetering the portal
-        game.physics.arcade.overlap(this.player.player, this.portal, this.enterPortal, null, this)
+		game.physics.arcade.overlap(this.player.player, this.enemy2.enemy, this.hurtPlayer, null, this)
 		// overlap with pick ups
 		this.checkCoins()
 		this.checkFinish()
@@ -189,18 +177,10 @@ var tunnel_2 = {
 	},
 
 	checkFinish: function () {
-		console.log(this.portaling)
-		if (this.portaling) {
+		if (Math.round(this.player.player.x / 32) > 102 && Math.round(this.player.player.x / 32) < 107 && Math.round(this.player.player.y / 32) < 1) {
 			game.global.current_level = 'forest'
 			game.global.level++
-			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'], '2')
-
-		} 
-		if ((Math.round(this.player.player.x / 32) < 2 && Math.round(this.player.player.y / 32) < 52 && Math.round(this.player.player.y / 32) > 47)) {
-			game.global.current_level = 'tunnel_3'
-			game.global.level++
-			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'])
-
+			game.state.start(game.global.current_level, true, false, this.player, this.player.player.data['health'], this.player.player.data['coins'], '3')
 		}
 	},
 
@@ -210,8 +190,8 @@ var tunnel_2 = {
 			game.global.current_level = 'gameOver'
 			game.state.start(game.global.current_level, true, true)
 		}
-    },
-    
+	},
+
     spawnCoins: function (name, num, xmin, xmax, ymin, ymax) {
 		if (name == 'coin') {
 			group = this.coins
@@ -227,7 +207,7 @@ var tunnel_2 = {
             x *= 32
             y *= 32
 			if (this.map.getTileWorldXY(x, y, 32, 32, this.layers.collision) == null) {
-				console.log(this.map.getTileWorldXY(x, y, 32, 32, this.layers.collision))
+				console.log('x: ' + x + '    y: ' + y)
 				item = new PickUp(game)
 				item.create(name, x, y)
 				group.add(item.item)
@@ -286,9 +266,5 @@ var tunnel_2 = {
 			this.coins.add(item.item)
 			//console.log(this.coins)
 		}
-    },
-    
-    enterPortal: function () {
-        this.portaling = true
-    }
+	}
 }
