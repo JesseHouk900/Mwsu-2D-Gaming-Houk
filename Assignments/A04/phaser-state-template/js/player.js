@@ -3,6 +3,7 @@ function Player(gameCopy) {
     this.nappa
     this.player
     this.trail
+    this.emitX
     this.fighters = []
     this.shootKey
     this.difficulty
@@ -27,19 +28,23 @@ function Player(gameCopy) {
         shootKey = game.input.keyboard.addKeys(fKey)
         // Prevent unintentional browser actions
         game.input.keyboard.addKeyCapture(fKey)
-        //this.makeTrail()
+        this.makeTrail()
+        if (this.player.animations.currentFrame.index == 0) {
+            this.player.body.setSize(61, 70, 14, 9)
+        }
+        else if (this.player.animations.currentFrame.index == 1) {
+            this.player.body.setSize(83, 86, 1, 1)
+        }
+        else if (this.player.animations.currentFrame.index == 2) {
+            this.player.body.setSize(40, 33, 23, 28)
+        }
 
     }
     this.update = function() {
-        if (this.player.animations.currentFrame.index == 0) {
-            this.player.body.setSize(61, 70, 14, 9)
-		}
-		else if (this.player.animations.currentFrame.index == 1) {
-            this.player.body.setSize(83, 86, 1, 1)
-		}
-		else if (this.player.animations.currentFrame.index == 2) {
-            this.player.body.setSize(40, 33, 23, 28)
-        }
+        this.emitX = this.player.x
+        this.emitY = this.player.y - (this.player.body.height / 2)
+        this.trail.emitX = this.emitX
+        this.trail.emitY = this.emitY
     }
     this.updateFighters = function(obj) {
         var points = []
@@ -126,7 +131,7 @@ function Player(gameCopy) {
 		return rate*skill;
     }
     this.makeTrail = function() {
-        this.trail = game.add.emitter(this.player.x, this.player.y - 22, 20)
+        this.trail = game.add.emitter(this.player.x, this.player.y - 22, 15)
 		this.trail.width = 1
 		this.trail.makeParticles('beam', [3])
 		this.trail.setXSpeed(0)
@@ -134,9 +139,11 @@ function Player(gameCopy) {
 		this.trail.setRotation(50, -50)
 		this.trail.gravity = 0
 		this.trail.setAlpha(1, 0.01, 800)
-		this.trail.setScale(.49, .5, .49, .5, 1000, Phaser.Easing.Quintic.Out)
-		this.trail.start(false, 5000, 10)
+		this.trail.setScale(.49, .5, .49, .5, 100, Phaser.Easing.Quintic.Out)
+		this.trail.start(false, 250, 2500)
         this.trail.frequency = .5
+        this.trail.emitX = this.emitX
+        this.trail.emitY = this.emitY
     }
     this.makeSprites = function() {
         var obj = game.add.sprite(0, 0,'nappa')

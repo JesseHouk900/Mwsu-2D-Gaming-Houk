@@ -6,7 +6,18 @@
 // +	Count a point for each obstacle passed.
 // +	Kill individual if they collide with obstacle.
 // +	Items should not all be the same!
+// -   Assignment 4
+// +    As score increases speed of obstacles increases
+// +	As score increases, frequency of obstacles increases
+// +	The player sprite has the ability to shoot bullets
+// +	Bullets colliding with obstacles destroys obstacles	
+// +	Animation plays when obstacle is destroyed
 
+// -	Sound plays when obstacle is destroyed
+
+// +	Score is increased as objects are destroyed
+// +	Score no longer based on passing objects
+// +	As difficulty increases, points for destroying objects increases
 
 
 
@@ -66,8 +77,8 @@ var play = {
 	update: function () {
 		this.bmpText.text = this.game.global.score
 		this.game.beam.update()
-		this.pts = this.updateFighters()
-		this.game.global.score += this.sumPoints()
+		/*this.pts = */this.updateFighters()
+		//this.game.global.score += this.sumPoints()
 		this.game.beam.move();
 		this.game.beam.checkShoot()
 		// Collision
@@ -77,13 +88,17 @@ var play = {
 		// Spawn enemies
 		random_gap = this.game.rnd.integerInRange(0, 1000)
 		// Higher the frequency of objects spawning (item_difficulty) the more often items spawn
+		// console.log('gap: ' + random_gap)
+		// console.log('id: ' + item_difficulty)
 		if (random_gap % item_difficulty > random_gap / 2) {
 			var gap = 120
 			var offset = (Math.random() < 0.5 ? -1 : 1) * Math.random() * (150)
 			var new_objects = Math.floor(this.game.rnd.integerInRange(0, item_difficulty) / 15)
-			//console.log(new_objects)
+			// console.log(new_objects)
 			for (var i = 0; i < new_objects; i++) {
-				this.spawnObstacle(/*entity number*/this.game.global.obstacle_id++,/*x*/ this.game.rnd.realInRange(0, this.game.width),/*y*/ this.game.height, /*speed*/ this.game.rnd.integerInRange(100, 400) + speed_difficulty, has_given_point = false)
+				s = this.game.rnd.integerInRange(this.game.global.score + 100, this.game.global.score * 1.5 + 100) + speed_difficulty
+				console.log(s)
+				this.spawnObstacle(/*entity number*/this.game.global.obstacle_id++,/*x*/ this.game.rnd.realInRange(0, this.game.width),/*y*/ this.game.height, /*speed*/ s, has_given_point = false)
 			}
 //		//this.game.beam.trail.x = this.game.beam.player.x
 		}
@@ -92,7 +107,8 @@ var play = {
 		frame_counter++
 		//this.game.global.score += this.scorePoint();
 	},
-	spawnObstacle: function (entity, x, y, speed,has_given_point) {
+	spawnObstacle: function (entity, x, y, speed, has_given_point) {
+		console.log('speed: ' + speed)
 		var obstacle
 		var r = Math.random()
 		var sizex = 1
@@ -146,21 +162,21 @@ var play = {
 			// }
 		}
 	},
-	obstaclePassed: function (obstacle) {
-		//console.log(this.obstacles)
-		var point = 0;
+	// obstaclePassed: function (obstacle) {
+	// 	//console.log(this.obstacles)
+	// 	var point = 0;
 
-		let py = this.game.beam.player.y;
-		let oy = obstacle.y;
-		let ox = obstacle.x;
+	// 	let py = this.game.beam.player.y;
+	// 	let oy = obstacle.y;
+	// 	let ox = obstacle.x;
 
-		//if player is below obstacle and within 5 pixels and choose only one of the pair
-		if(py > oy && Math.abs(py-oy) < 5/* && ox < this.game.width/2*/){
-			point++;
-			this.sound.score.play('', 0, 0.5, false)
-		}
-		this.game.global.score += point;
-	},
+	// 	//if player is below obstacle and within 5 pixels and choose only one of the pair
+	// 	if(py > oy && Math.abs(py-oy) < 5/* && ox < this.game.width/2*/){
+	// 		point++;
+	// 		this.sound.score.play('', 0, 0.5, false)
+	// 	}
+	// 	this.game.global.score += point;
+	// },
 	hitObstacle: function(obstacle) {
 		// player hits lethal obstacle
 		if (obstacle.key == 'obstacle') {
@@ -172,24 +188,29 @@ var play = {
 		}
 	},
 	getCollectable: function (obstacle) {
-		// if (obstacle.key == 'coin') {
-		// 	this.scorePoint(5, obstacle)
-		// }
-		// if (obstacle.key == 'star') {
-		// 	this.scorePoint(10, obstacle)
-		// }
+		console.log(obstacle.key)
+		if (obstacle.key == 'coin') {
+			this.scorePoint(5)
+		}
+		if (obstacle.key == 'star') {
+			this.scorePoint(10)
+		}
 		obstacle.destroy()
 	},
-	scorePoint: function (point = 0, obstacle) {
+	scorePoint: function (point = 0) {
 		this.sound.score.play('', 0, 0.5, false)
 		var s = this.game.global.score
-		//console.log('s: ' + speed_difficulty)
+		console.log('score: ' + this.game.global.score)
 		//console.log('i: ' + item_difficulty)
 		// As score increases, speed of obstacles increase
-		speed_difficulty = s % (s / 10)
-		var r = s / (7 * (s % 7))
+		speed_difficulty = s % ((s / 10) + 1)
+		console.log('s: ' + speed_difficulty)
+		var r = s / (7 * (s % 7) + 1)
 		// As score increases, frequency of obstacles increases
+		// console.log('id: ' + item_difficulty)
 		item_difficulty += (s%2 == 0) ? r : -1 / s
+		// console.log('s: ' + s)
+		// console.log('r: ' + r)
 		this.game.global.score += point;
 	},
 	// Tap on touchscreen or click with mouse

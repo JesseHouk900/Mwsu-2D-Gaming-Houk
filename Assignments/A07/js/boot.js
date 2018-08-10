@@ -1,12 +1,12 @@
-function boot () {
+var boot = {
     
-    preload = function () {
+    preload: function () {
         console.log('boot')
-        this.game.load.image('load_bar', 'assets/images/loading_boarder.png')
-        this.game.load.image('progress', 'assets/images/loading_interior.png')
-    }
+        game.load.image('load_bar', 'assets/images/loading_border.png')
+        game.load.image('progress', 'assets/images/loading_interior.png')
+    },
 
-    create = function () {
+    create: function () {
         
         if (this.isDeviceMobile()) {
             console.log('on device')
@@ -22,19 +22,19 @@ function boot () {
         else {
             console.log('on comp')
             
-            this.scale.minWidth = game.global.minWidth
-            this.scale.minHeight = game.gloabl.minHeight
-            this.scale.maxWidth = game.global.maxWidth
-            this.scale.maxHeight = game.global.maxHeight
+            this.scale.minWidth = config.minWidth
+            this.scale.minHeight = config.minHeight
+            this.scale.maxWidth = config.maxWidth
+            this.scale.maxHeight = config.maxHeight
         }
 
         this.scale.pageAlignHorizontally = true
         this.scale.pageAlignVertically = true
         this.scale.setScreenSize = true
         game.state.start("preload")
-    }
+    },
 
-    isDeviceMobile = function () {
+    isDeviceMobile: function () {
         var isMobile = {
             Android: function () {
                 return navigator.userAgent.match(/Android/i)
